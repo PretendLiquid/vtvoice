@@ -14,6 +14,10 @@ export const ConnectionStatus = styled.div`
         border-radius: 10px;
         height: 30px;
         border-style: none;
+        :disabled {
+            background-color: #7948df;
+            opacity: 0.5;
+        }
     }
 `;
 
