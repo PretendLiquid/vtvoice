@@ -17,6 +17,7 @@ import { OverallContainer } from './styles/Container.styled';
 import { Chiplist } from './chiplist';
 import { stringify } from 'querystring';
 import { Close, Info } from './styles/Info.styled';
+import { Helmet } from "react-helmet";
 
 
 // function useLocalStorage<T>(storageKey: string, defaultValue: T){
@@ -126,6 +127,9 @@ function App() {
 
   return (
     <div className="App">
+      <Helmet>
+        <title>Vtvoice</title>
+      </Helmet>
       <GlobalStyles />
       <OverallContainer>
         <CardContainer>
@@ -188,14 +192,14 @@ function App() {
           setHotkeyCommands(hotkeyCommands.filter(hc => hc.command.command !== element.command.command))
         }} />
         <Footer>
-          <div style={{display: 'flex', gap: '5px'}}>
+          <div style={{ display: 'flex', gap: '5px' }}>
             <Question onClick={() => { setShowInfo(true) }}>?</Question>
 
             <Question onClick={() => { setShowPersonalNote(true) }}>♥</Question>
           </div>
           <Credit>
             <Credits>Stiched together by PretendLiquid</Credits>
-            <Mail onClick={() => {window.location.href = 'mailto:pretendliquid@gmail.com'}}>✉</Mail>
+            <Mail onClick={() => { window.location.href = 'mailto:pretendliquid@gmail.com' }}>✉</Mail>
           </Credit>
         </Footer>
       </OverallContainer>
@@ -222,7 +226,6 @@ function App() {
           <Close onClick={() => { setShowPersonalNote(false) }}>X</Close>
         </Info>
       )}
-
     </div>
   );
 }
