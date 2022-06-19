@@ -4,7 +4,6 @@ import { CurrentModel, Hotkey } from "vtubestudio";
 import { useVClient } from './vtubestudio';
 import { Dictaphone } from './Dictaphone';
 import DropDown from './dropdown';
-import { ClickableList } from './clickableList';
 import { HotkeyCommand } from './common';
 import { Footer } from './styles/Footer.styled';
 import { GlobalStyles } from './styles/Global';
@@ -129,11 +128,8 @@ function App() {
           <Card>
             <ConnectionStatus>
               <div>
-                <button disabled={connection.connected} onClick={async () => {
-                  await connection.runCommand(async () => {
-                    const stats = await connection.client.plugin.statistics();
-                    console.log("VTube Studio verison:", stats.vTubeStudioVersion);
-                  })
+                <button disabled={connection.connected} onClick={() => {
+                  connection.client.wsw.reconnect();
                 }}>Connect</button>
               </div>
               <ModelStatus>
@@ -190,6 +186,9 @@ function App() {
         <Chiplist items={hotkeyCommands} onSelect={(element) => { }} onRemove={(element) => {
           setHotkeyCommands(hotkeyCommands.filter(hc => hc.command.command !== element.command.command))
         }} />
+        <Footer>
+          <p>Stiched togheter by PretendLiquid</p>
+        </Footer>
       </OverallContainer>
     </div>
   );

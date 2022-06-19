@@ -1,7 +1,6 @@
 import React from "react";
 import { HotkeyCommand } from "./common";
 import { Chip, ChipContainer, ChipContainerInner, ChipContent, ChipRemove } from "./styles/Chip.styles";
-import { List, ListContainer } from "./styles/List.styled";
 
 type ClickableListProps = {
   items: HotkeyCommand[];

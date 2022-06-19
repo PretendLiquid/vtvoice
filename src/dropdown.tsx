@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Hotkey } from "vtubestudio";
+import { List } from "./styles/List.styled";
 
 type DropDownProps = {
   hotkeys: Hotkey[];
@@ -30,7 +31,7 @@ const DropDown: React.FC<DropDownProps> = ({
 
   return (
     <>
-      <div className={showDropDown ? "dropdown" : "dropdown active"}>
+      <List className={showDropDown ? "dropdown" : "dropdown active"}>
         {hotkeys.map(
           (hotkey: Hotkey, index: number): JSX.Element => {
             return (
@@ -45,7 +46,7 @@ const DropDown: React.FC<DropDownProps> = ({
             );
           }
         )}
-      </div>
+      </List>
     </>
   );
 };
