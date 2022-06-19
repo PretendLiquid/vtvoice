@@ -16,6 +16,9 @@ export const AddPanel = styled.div`
         height: 30px;
         border-style: none;
         width: 125px;
+        :hover{
+            opacity: 0.9;
+        }
         :disabled {
             background-color: #7948df;
             opacity: 0.5;

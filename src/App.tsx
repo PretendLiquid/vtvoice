@@ -121,12 +121,6 @@ function App() {
     word = <></>
   }
 
-  const chip = () => {
-    return <div>
-
-    </div>
-  }
-
   return (
     <div className="App">
       <GlobalStyles />

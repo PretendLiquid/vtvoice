@@ -14,6 +14,9 @@ export const ConnectionStatus = styled.div`
         border-radius: 10px;
         height: 30px;
         border-style: none;
+        :hover{
+            opacity: 0.9;
+        }
         :disabled {
             background-color: #7948df;
             opacity: 0.5;
@@ -34,6 +37,13 @@ export const VoiceStatus = styled.div`
         border-radius: 10px;
         height: 30px;
         border-style: none;
+        :hover{
+            opacity: 0.9;
+        }
+        :disabled {
+            background-color: #7948df;
+            opacity: 0.5;
+        }
     }
 `;
 
