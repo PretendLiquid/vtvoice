@@ -1,4 +1,3 @@
-import { listeners } from 'process';
 import React from 'react'
 import * as vtubestudio from 'vtubestudio';
 
@@ -32,6 +31,7 @@ export class WebSocketWrapper {
 
 export function useVClient() {
     const [connected, setConnected] = React.useState(false);
+    const [apiError, setApiError] = React.useState<Error | null>(null)
 
     const client = React.useMemo(() => {
         const client = new VClient()
@@ -42,17 +42,17 @@ export function useVClient() {
 
     const runCommand = React.useCallback(async (callBack: () => Promise<void>) => {
         try {
-            if (client.wsw.ws.readyState === WebSocket.CLOSED) {
-                client.wsw.reconnect();
-            }
             await callBack();
         } catch (e: any) {
             if (!String(e).includes('Plugin could not authenticate')) {
-                console.error('Error excuting VTube Studio command' + e)
+                console.error('Error excuting VTube Studio command' + e);
+                setApiError(e);
+            } else {
+                setConnected(false);
             }
         }
     }, []);
 
-    return { connected, client, runCommand }
+    return { connected, apiError , client, runCommand }
 }
 

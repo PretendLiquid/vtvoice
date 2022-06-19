@@ -10,6 +10,7 @@ export const ChipContainer = styled.div`
     background-color: white;
     background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='21' ry='21' stroke='%23F2EDFCFF' stroke-width='10' stroke-dasharray='15%2c 15%2c 1' stroke-dashoffset='0' stroke-linecap='round'/%3e%3c/svg%3e");
     border-radius: 21px;
+    box-shadow: 5px 5px #303030;
 `;
 
 export const ChipContainerInner = styled.div`

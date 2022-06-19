@@ -5,9 +5,9 @@ import { useVClient } from './vtubestudio';
 import { Dictaphone } from './Dictaphone';
 import DropDown from './dropdown';
 import { HotkeyCommand } from './common';
-import { Footer } from './styles/Footer.styled';
+import { Credit, Credits, Footer, Mail, PersonalNote, Question } from './styles/Footer.styled';
 import { GlobalStyles } from './styles/Global';
-import { CarcContainer, Card } from './styles/Card.styled';
+import { CardContainer, Card } from './styles/Card.styled';
 import { CircleGreen, CircleRed } from './styles/Circle.styled';
 import { ConnectionStatus, ModelStatus, StatusContainer, VoiceStatus } from './styles/Status.styled';
 import { AddPanel } from './styles/AddPanel.styled';
@@ -15,6 +15,8 @@ import { HorizontalSplit, SplitWrapper } from './styles/Split.styled';
 import { UnderlinedWord, UnderlinedWordContainer } from './styles/Word.styled';
 import { OverallContainer } from './styles/Container.styled';
 import { Chiplist } from './chiplist';
+import { stringify } from 'querystring';
+import { Close, Info } from './styles/Info.styled';
 
 
 // function useLocalStorage<T>(storageKey: string, defaultValue: T){
@@ -44,6 +46,8 @@ function App() {
   const [currentWord, setCurrentWord] = useState<string>('');
   const [hotkeys, setHotkeys] = useState<Hotkey[]>([]);
   const [currentModel, setCurrentModel] = useState<CurrentModel | null>();
+  const [showInfo, setShowInfo] = useState<boolean>(false);
+  const [showPersonalNote, setShowPersonalNote] = useState<boolean>(false);
 
   /**
  * Hide the drop down menu if click occurs
@@ -124,13 +128,10 @@ function App() {
     <div className="App">
       <GlobalStyles />
       <OverallContainer>
-        <CarcContainer>
+        <CardContainer>
           <Card>
             <ConnectionStatus>
               <div>
-                <button disabled={connection.connected} onClick={() => {
-                  connection.client.wsw.reconnect();
-                }}>Connect</button>
               </div>
               <ModelStatus>
                 <StatusContainer>
@@ -182,14 +183,46 @@ function App() {
               <button onClick={addCommand} disabled={!connection.connected}>Add</button>
             </AddPanel>
           </Card>
-        </CarcContainer>
+        </CardContainer>
         <Chiplist items={hotkeyCommands} onSelect={(element) => { }} onRemove={(element) => {
           setHotkeyCommands(hotkeyCommands.filter(hc => hc.command.command !== element.command.command))
         }} />
         <Footer>
-          <p>Stiched togheter by PretendLiquid</p>
+          <div style={{display: 'flex', gap: '5px'}}>
+            <Question onClick={() => { setShowInfo(true) }}>?</Question>
+
+            <Question onClick={() => { setShowPersonalNote(true) }}>♥</Question>
+          </div>
+          <Credit>
+            <Credits>Stiched together by PretendLiquid</Credits>
+            <Mail onClick={() => {window.location.href = 'mailto:pretendliquid@gmail.com'}}>✉</Mail>
+          </Credit>
         </Footer>
       </OverallContainer>
+      {showInfo && (
+        <Info>
+          <p>The webapp tries to connect to localhost:8001. In the future this will be customizeable</p>
+          <p>If it is not connected try refresing and check vtube studio for auth popup</p>
+          <p>To start using it click the "start voice detection" button</p>
+          <p>1. Select a hotkey</p>
+          <p>2. Say a word</p>
+          <p>3. Click the "Add" button</p>
+          <p>To stop voice detection click the "stop voice detection" button</p>
+          <Close onClick={() => { setShowInfo(false) }}>X</Close>
+        </Info>
+      )}
+      {showPersonalNote && (
+        <Info>
+          <p>Thanks so much for using my webapp. I hope you have many fun moments with it. </p>
+          <p>If you have a great idea for a new vtubestudio project feel free to contact me.</p>
+          <p>This project was a trainingground for me to practice typescript.</p>
+          <p> I will continue to update and improve this project until I dont</p>
+          <p>I hope you enjoy it</p>
+          <p>- PretentLiquid (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧</p>
+          <Close onClick={() => { setShowPersonalNote(false) }}>X</Close>
+        </Info>
+      )}
+
     </div>
   );
 }
