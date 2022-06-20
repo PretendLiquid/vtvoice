@@ -189,7 +189,7 @@ function App() {
           </Card>
         </CardContainer>
         <Chiplist items={hotkeyCommands} onSelect={(element) => { }} onRemove={(element) => {
-          setHotkeyCommands(hotkeyCommands.filter(hc => hc.command.command !== element.command.command))
+          setHotkeyCommands(hotkeyCommands.filter(hc => hc.command.command !== element.command.command && hc.hotkey.name !== element.hotkey.name));
         }} />
         <Footer>
           <div style={{ display: 'flex', gap: '5px' }}>
