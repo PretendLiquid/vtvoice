@@ -2,9 +2,11 @@ import styled from "styled-components";
 import "@fontsource/roboto"
 
 export const Footer = styled.div`
+    position: fixed;
+    bottom: 10px;
     display: flex;
     justify-content: space-between;
-    width: 100%;
+    width: 98%;
 `;
 
 export const Question = styled.button`
