@@ -18,6 +18,8 @@ import { Chiplist } from './chiplist';
 import { stringify } from 'querystring';
 import { Close, Info } from './styles/Info.styled';
 import { Helmet } from "react-helmet";
+import { AudioContainer, AudioSelect, MicText } from './styles/Audio.styled';
+import { ClickList } from './clickList';
 
 
 // function useLocalStorage<T>(storageKey: string, defaultValue: T){
@@ -35,6 +37,8 @@ import { Helmet } from "react-helmet";
 
 function App() {
   const [hotkeyCommands, setHotkeyCommands] = useState<HotkeyCommand[]>((JSON.parse(localStorage.getItem('hotkeyCommands')!) ?? []) as HotkeyCommand[]);
+  const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
+  const [currentDevice, setCurrentDevice] = useState<MediaDeviceInfo>();
 
   useEffect(() => {
     localStorage.setItem('hotkeyCommands', JSON.stringify(hotkeyCommands));
@@ -61,6 +65,15 @@ function App() {
       setShowDropDown(false);
     }
   };
+
+  useEffect(() => {
+    const getMedia = async () => {
+      setAudioDevices((await navigator.mediaDevices.enumerateDevices()).filter((value) => value.kind === 'audioinput'));
+    }
+
+    getMedia();
+  }, [])
+
 
   /**
 * Callback function to consume the
@@ -202,6 +215,14 @@ function App() {
             <Mail onClick={() => { window.location.href = 'mailto:pretendliquid@gmail.com' }}>✉</Mail>
           </Credit>
         </Footer>
+        <AudioContainer>
+          <MicText>
+            <p>Mic check?</p>
+          </MicText>
+          <ClickList items={audioDevices} onSelect={(Element) => { navigator.mediaDevices.getUserMedia({ audio: Element });
+        setCurrentDevice(Element);
+        }} onRemove={(Element) => { }} />
+        </AudioContainer>
       </OverallContainer>
       {showInfo && (
         <Info>
