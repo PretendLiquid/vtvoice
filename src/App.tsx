@@ -312,7 +312,7 @@ function App() {
               <WordButton style={{ display: 'block', width: '100px' }} onClick={() => setShowLangDropDown(!showLangDropDown)} onBlur={(event: React.FocusEvent<HTMLButtonElement>): void => dismissHandler(event)}>
                 <div>{selectedLang}</div>
                 {showLangDropDown && (
-                  <LanguageDropdown values={['en-GB', 'en-US', 'da-DK', 'de-DE', 'ja']} showDropDown={false} toggleDropDown={() => setShowLangDropDown(!showLangDropDown)} onSelection={(value: string) => { setSelectedLang(value); }} />
+                  <LanguageDropdown values={['en-GB', 'en-US', 'da-DK', 'de-DE', 'ja', 'es-ES']} showDropDown={false} toggleDropDown={() => setShowLangDropDown(!showLangDropDown)} onSelection={(value: string) => { setSelectedLang(value); }} />
                 )}
               </WordButton>
               <WordButton onClick={() => {
