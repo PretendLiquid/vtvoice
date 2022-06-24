@@ -6,6 +6,8 @@ export const List = styled.div`
     border-radius: 25px;
     padding: 2px;
 
+    height: 100px;
+    overflow-y: scroll;
     p {
         color: white;
         font-family: roboto, sans-serif;

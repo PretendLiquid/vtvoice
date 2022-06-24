@@ -34,5 +34,4 @@ export const AudioDevice = styled.button`
     :hover {
         opacity: 0.5;
     }
-    z-index: 1;
 `;

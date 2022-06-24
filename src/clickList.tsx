@@ -1,5 +1,5 @@
 import React from "react";
-import { AudioContainer, AudioDevice, AudioSelect, MicText } from "./styles/Audio.styled";
+import { AudioDevice, AudioSelect,  } from "./styles/Audio.styled";
 
 type ClickableListProps = {
   items: MediaDeviceInfo[];
@@ -12,7 +12,7 @@ export function ClickList(props: ClickableListProps) {
   return (
       <AudioSelect>
         {props.items.map((item, i) => (
-          <AudioDevice onClick={() => props.onSelect(item)}>
+          <AudioDevice key={i} onClick={() => props.onSelect(item)}>
             {item.label}
           </AudioDevice>
         ))}

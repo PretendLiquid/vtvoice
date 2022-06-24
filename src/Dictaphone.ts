@@ -1,25 +1,34 @@
-import { createSpeechlySpeechRecognition } from "@speechly/speech-recognition-polyfill";
+import { createSpeechlySpeechRecognition, MicrophoneNotAllowedError } from "@speechly/speech-recognition-polyfill";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import { Command } from "./common";
 
-const appId = '80fedddb-c64d-4067-87be-50ca1cd84159';
-const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(appId);
-SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
+// const appId = '80fedddb-c64d-4067-87be-50ca1cd84159';
+// const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(appId);
+// SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
 
-export function Dictaphone(commands: Command[]) {
+// const speechRecognition = new SpeechlySpeechRecognition();
+
+// speechRecognition.onerror = (event) => {
+//     console.log("error error: " + event);
+// }
+
+export function Dictaphone(commands: Command[], language: string) {
     const {
         transcript,
         listening,
         browserSupportsSpeechRecognition,
         interimTranscript,
-        resetTranscript
+        resetTranscript,
+        finalTranscript,
+        isMicrophoneAvailable
     } = useSpeechRecognition({ commands });
-    const startListening = () => SpeechRecognition.startListening({ continuous: true });
+    const startListening = () => SpeechRecognition.startListening({ language: language, continuous: true });
     const stopListening = () => SpeechRecognition.stopListening();
 
     if (!browserSupportsSpeechRecognition) {
         alert("Your browser does not support speech recognition.");
     }
 
-    return { transcript, listening, startListening, interimTranscript, stopListening, resetTranscript };
+
+    return { transcript, listening, startListening, interimTranscript, stopListening, resetTranscript, finalTranscript, isMicrophoneAvailable};
 };

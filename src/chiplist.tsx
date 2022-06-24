@@ -15,8 +15,8 @@ export function Chiplist(props: ClickableListProps) {
       <ChipContainerInner>
         <ChipContent>
           {props.items.map((item, i) => (
-            <Chip onClick={() => props.onSelect(item)}>
-              {item.hotkey.name + " : " + item.command.command.toLowerCase()}
+            <Chip key={i} onClick={() => props.onSelect(item)}>
+              {item.hotkey.name + " : " + item.word}
               <ChipRemove onClick={() => props.onRemove(item)}>x</ChipRemove>
             </Chip>
           ))}

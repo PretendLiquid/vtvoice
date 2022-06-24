@@ -20,6 +20,8 @@ import { Close, Info } from './styles/Info.styled';
 import { Helmet } from "react-helmet";
 import { AudioContainer, AudioSelect, MicText } from './styles/Audio.styled';
 import { ClickList } from './clickList';
+import { Example, FlexStartText, TooltipBox, TooltipCard, TooltipText, WordButton, WordContainerInner, WordSaid, WordSelctionContainer } from './styles/WordSelction.styled';
+import LanguageDropdown from './languageDropdown';
 
 
 // function useLocalStorage<T>(storageKey: string, defaultValue: T){
@@ -47,12 +49,17 @@ function App() {
 
   const [selectedHotkey, setSelectedHotkey] = useState<Hotkey>();
   const [showDropDown, setShowDropDown] = useState<boolean>(false);
+  const [showLangDropDown, setShowLangDropDown] = useState<boolean>(false);
 
   const [currentWord, setCurrentWord] = useState<string>('');
   const [hotkeys, setHotkeys] = useState<Hotkey[]>([]);
   const [currentModel, setCurrentModel] = useState<CurrentModel | null>();
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [showPersonalNote, setShowPersonalNote] = useState<boolean>(false);
+  const [exactWords, setExactWords] = useState<boolean>(true);
+  const [showWordSelect, setShowWordSelect] = useState<boolean>(false);
+  const [selectedWord, setSelectedWord] = useState<string>("");
+  const [selectedLang, setSelectedLang] = useState<string>("en-GB");
 
   /**
  * Hide the drop down menu if click occurs
@@ -86,8 +93,11 @@ function App() {
   };
 
   const addCommand = () => {
-    if (selectedHotkey && currentWord) {
-      setHotkeyCommands([...hotkeyCommands, { hotkey: selectedHotkey, command: { command: currentWord, callback: async () => await selectedHotkey.trigger() } }]);
+    if (selectedHotkey && selectedWord) {
+      const word = exactWords ? selectedWord : new RegExp("\\b" + selectedWord + "\\b");
+      setHotkeyCommands([...hotkeyCommands, {
+        hotkey: selectedHotkey, command: { command: word, callback: async () => await selectedHotkey.trigger() }, word: selectedWord
+      }]);
     }
   };
 
@@ -98,7 +108,7 @@ function App() {
     setShowDropDown(!showDropDown);
   }
 
-  const { interimTranscript, listening, startListening, stopListening } = Dictaphone(hotkeyCommands.map(hc => hc.command));
+  const { interimTranscript, listening, startListening, stopListening, transcript, finalTranscript, isMicrophoneAvailable } = Dictaphone(hotkeyCommands.map(hc => hc.command), selectedLang);
 
 
   useEffect(() => {
@@ -106,6 +116,13 @@ function App() {
       setCurrentWord(interimTranscript);
     }
   }, [interimTranscript])
+
+  useEffect(() => {
+    console.log("Changing language new one: " + selectedLang);
+    if (listening) {
+      startListening();
+    }
+  }, [selectedLang])
 
 
   const refreshHotkeys = useCallback(() => {
@@ -194,7 +211,7 @@ function App() {
               </div>
               <div>
                 <p>Word</p>
-                <UnderlinedWord>{word}</UnderlinedWord>
+                <button onClick={() => setShowWordSelect(true)}>{selectedWord ? selectedWord : " . . ."}</button>
               </div>
 
               <button onClick={addCommand} disabled={!connection.connected}>Add</button>
@@ -202,7 +219,7 @@ function App() {
           </Card>
         </CardContainer>
         <Chiplist items={hotkeyCommands} onSelect={(element) => { }} onRemove={(element) => {
-          setHotkeyCommands(hotkeyCommands.filter(hc => hc.command.command !== element.command.command && hc.hotkey.name !== element.hotkey.name));
+          setHotkeyCommands(hotkeyCommands.filter(hc => !(hc.word === element.word && hc.hotkey.name === element.hotkey.name)));
         }} />
         <Footer>
           <div style={{ display: 'flex', gap: '5px' }}>
@@ -210,6 +227,9 @@ function App() {
 
             <Question onClick={() => { setShowPersonalNote(true) }}>♥</Question>
           </div>
+          <Credit>
+            <Credits>Current language: {selectedLang}</Credits>
+          </Credit>
           <Credit>
             <Credits>Stiched together by PretendLiquid</Credits>
             <Mail onClick={() => { window.location.href = 'mailto:pretendliquid@gmail.com' }}>✉</Mail>
@@ -219,9 +239,10 @@ function App() {
           <MicText>
             <p>Mic check?</p>
           </MicText>
-          <ClickList items={audioDevices} onSelect={(Element) => { navigator.mediaDevices.getUserMedia({ audio: Element });
-        setCurrentDevice(Element);
-        }} onRemove={(Element) => { }} />
+          <ClickList items={audioDevices} onSelect={(Element) => {
+            navigator.mediaDevices.getUserMedia({ audio: Element });
+            setCurrentDevice(Element);
+          }} onRemove={(Element) => { }} />
         </AudioContainer>
       </OverallContainer>
       {showInfo && (
@@ -230,8 +251,9 @@ function App() {
           <p>If it is not connected try refresing and check vtube studio for auth popup</p>
           <p>To start using it click the "start voice detection" button</p>
           <p>1. Select a hotkey</p>
-          <p>2. Say a word</p>
-          <p>3. Click the "Add" button</p>
+          <p>2. click word button</p>
+          <p>3. Say a word</p>
+          <p>4. Click the "Add" button</p>
           <p>To stop voice detection click the "stop voice detection" button</p>
           <Close onClick={() => { setShowInfo(false) }}>X</Close>
         </Info>
@@ -246,6 +268,61 @@ function App() {
           <p>- PretentLiquid (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧</p>
           <Close onClick={() => { setShowPersonalNote(false) }}>X</Close>
         </Info>
+      )}
+      {showWordSelect && (
+        <WordSelctionContainer>
+          <WordSaid>
+            <p>{currentWord}</p>
+          </WordSaid>
+          <WordContainerInner>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              {exactWords ? <WordButton onClick={() => setExactWords(!exactWords)}>
+                Exact words
+                <TooltipCard>
+                  <TooltipText>
+                    <p>?</p>
+                  </TooltipText>
+                  <TooltipBox>
+                    <FlexStartText>Triggers hotkeys everytime you say be exactly the words described and pauses.</FlexStartText>
+                    <div style={{ width: '100%', borderTopStyle: 'solid', paddingBottom: '10px' }}></div>
+                    <FlexStartText>Example: "I like saying cat"</FlexStartText>
+                    <Example>
+                      <p style={{ color: 'red' }}>✗: I like saying cat and dog</p> <p style={{ color: 'lime' }}> ✔: I like saing cat</p>
+                    </Example>
+                    <FlexStartText>Exact word setting means you have to finish talking before it detects</FlexStartText>
+                  </TooltipBox>
+                </TooltipCard>
+              </WordButton> : <WordButton onClick={() => setExactWords(!exactWords)}>
+                Words in sentence
+                <TooltipCard>
+                  <TooltipText>
+                    <p>?</p>
+                  </TooltipText>
+                  <TooltipBox>
+                    <FlexStartText>Triggers hotkeys everytime a word is said</FlexStartText>
+                    <div style={{ width: '100%', borderTopStyle: 'solid', paddingBottom: '10px' }}></div>
+                    <FlexStartText>Example: "I like saying cat"</FlexStartText>
+                    <Example>
+                      <p style={{ color: 'red' }}>✗: I like saying dog and dog </p> <p style={{ color: 'lime' }}> ✔: I like saying cat and dog but I like saying cat the most</p>
+                    </Example>
+                    <FlexStartText>You don't have to finish talking before it detects</FlexStartText>
+                  </TooltipBox>
+                </TooltipCard>
+              </WordButton>}
+              <WordButton style={{ display: 'block', width: '100px' }} onClick={() => setShowLangDropDown(!showLangDropDown)} onBlur={(event: React.FocusEvent<HTMLButtonElement>): void => dismissHandler(event)}>
+                <div>{selectedLang}</div>
+                {showLangDropDown && (
+                  <LanguageDropdown values={['en-GB', 'en-US', 'da-DK', 'de-DE', 'ja']} showDropDown={false} toggleDropDown={() => setShowLangDropDown(!showLangDropDown)} onSelection={(value: string) => { setSelectedLang(value); }} />
+                )}
+              </WordButton>
+              <WordButton onClick={() => {
+                setSelectedWord(currentWord);
+                setShowWordSelect(false);
+              }}>Add</WordButton>
+            </div>
+          </WordContainerInner>
+          <Close onClick={() => { setShowWordSelect(false) }}>X</Close>
+        </WordSelctionContainer>
       )}
     </div>
   );

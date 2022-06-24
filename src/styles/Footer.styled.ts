@@ -58,6 +58,7 @@ export const Credit = styled.div`
     padding-right: 5px;
     box-shadow: 2px 2px #2a2a2a;
     height: 50px;
+    z-index: 1;
 `;
 
 export const Mail = styled.button`
