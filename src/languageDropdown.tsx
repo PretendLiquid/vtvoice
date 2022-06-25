@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Scrollbars from "react-custom-scrollbars-2";
 import { Hotkey } from "vtubestudio";
 import { List } from "./styles/List.styled";
 
@@ -31,7 +32,7 @@ const LanguageDropdown: React.FC<DropDownProps> = ({
 
   return (
     <>
-      <List style={{width: '100px', display:"block"}} className={showDropDown ? "dropdown" : "dropdown active"}>
+      <Scrollbars style={{ display: "block", backgroundColor: '#7948df', height: '150px', borderRadius: '12px' }} className={showDropDown ? "dropdown" : "dropdown active"}>
         {values.map(
           (value: string, index: number): JSX.Element => {
             return (
@@ -46,7 +47,7 @@ const LanguageDropdown: React.FC<DropDownProps> = ({
             );
           }
         )}
-      </List>
+      </Scrollbars>
     </>
   );
 };
