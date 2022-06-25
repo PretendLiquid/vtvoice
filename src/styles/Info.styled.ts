@@ -6,8 +6,8 @@ export const Info = styled.div`
     left: 200px;
     right: 200px;
     bottom: 80px;
-    border-radius: 20px;
-    background-color: #5622c4;
+    border-radius: ${({ theme }) => theme.borderRadius.large};;
+    background-color: ${({ theme }) => theme.colors.base2};
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -15,7 +15,7 @@ export const Info = styled.div`
     font-weight: bold;
     border-style: none;
     font-size: 20px;
-    color: white;
+    color: ${({ theme }) => theme.colors.text};
     padding-top: 20px;
     padding-bottom: 20px;
     padding-left: 40px;

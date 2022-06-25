@@ -73,13 +73,13 @@ function App() {
     if (event.currentTarget === event.target) {
       setShowDropDown(false);
     }
-  };
+  }
+  
+  const getMedia = async () => {
+    setAudioDevices((await navigator.mediaDevices.enumerateDevices()).filter((value) => value.kind === 'audioinput'));
+  }
 
   useEffect(() => {
-    const getMedia = async () => {
-      setAudioDevices((await navigator.mediaDevices.enumerateDevices()).filter((value) => value.kind === 'audioinput'));
-    }
-
     getMedia();
   }, [])
 
@@ -238,15 +238,22 @@ function App() {
               <Mail onClick={() => { window.location.href = 'mailto:pretendliquid@gmail.com' }}>✉</Mail>
             </Credit>
           </Footer>
-          <AudioContainer>
-            <MicText>
-              <p>Mic check?</p>
-            </MicText>
-            <ClickList items={audioDevices} onSelect={(Element) => {
-              navigator.mediaDevices.getUserMedia({ audio: Element });
-              setCurrentDevice(Element);
-            }} onRemove={(Element) => { }} />
-          </AudioContainer>
+          {(audioDevices.length !== 0 && audioDevices[0].label !== "") ?
+            <AudioContainer>
+              <MicText>
+                <p>Select a microphone</p>
+              </MicText>
+              <ClickList items={audioDevices} onSelect={(Element) => {
+                navigator.mediaDevices.getUserMedia({ audio: Element });
+                setCurrentDevice(Element);
+              }} onRemove={(Element) => { }} />
+            </AudioContainer>
+            : <WordButton onClick={() => navigator.mediaDevices.getUserMedia({audio:true}).then((value) => {
+              console.log("Mic permission given");
+              getMedia();
+          }).catch((error)=> console.log("Error while trying to get mic permission: " + error))}>Give microphone permission</WordButton>
+          }
+
         </OverallContainer>
         {showInfo && (
           <Info>

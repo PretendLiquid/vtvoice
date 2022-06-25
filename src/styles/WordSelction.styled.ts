@@ -7,7 +7,7 @@ export const WordSelctionContainer = styled.div`
     left: 200px;
     right: 200px;
     border-radius: 20px;
-    background-color: #5622c4;
+    background-color: ${({ theme }) => theme.colors.base2};
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -16,12 +16,12 @@ export const WordSelctionContainer = styled.div`
     font-weight: bold;
     border-style: none;
     font-size: 20px;
-    color: white;
+    color: ${({ theme }) => theme.colors.base};
     padding-top: 20px;
     padding-bottom: 20px;
     padding-left: 40px;
     padding-right: 40px;
-    box-shadow: 5px 5px #000000;
+    box-shadow: ${({ theme }) => theme.shadow.medium} ${({ theme }) => theme.colors.shadow};
 `;
 
 export const WordButton = styled.button`
