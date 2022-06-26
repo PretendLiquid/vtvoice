@@ -1,6 +1,5 @@
-import React from 'react'
+import React from 'react';
 import * as vtubestudio from 'vtubestudio';
-
 
 export class VClient {
     plugin!: vtubestudio.Plugin
@@ -28,15 +27,19 @@ export class WebSocketWrapper {
     }
 }
 
+type props = {
+    host?: string;
+    port?: string;
+}
 
-export function useVClient() {
+export function useVClient(props: props) {
     const [connected, setConnected] = React.useState(false);
     const [apiError, setApiError] = React.useState<Error | null>(null)
 
     const client = React.useMemo(() => {
-        const client = new VClient()
-        client.wsw.ws.addEventListener('open', () => setConnected(true))
-        client.wsw.ws.addEventListener('close', () => setConnected(false))
+        const client = new VClient(props.host ? `ws://${props.host}:${props.port}` : undefined);
+        client.wsw.ws.addEventListener('open', () => setConnected(true));
+        client.wsw.ws.addEventListener('close', () => setConnected(false));
         return client
     }, [])
 

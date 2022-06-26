@@ -25,10 +25,5 @@ export function Dictaphone(commands: Command[], language: string) {
     const startListening = () => SpeechRecognition.startListening({ language: language, continuous: true });
     const stopListening = () => SpeechRecognition.stopListening();
 
-    if (!browserSupportsSpeechRecognition) {
-        alert("Your browser does not support speech recognition.");
-    }
-
-
-    return { transcript, listening, startListening, interimTranscript, stopListening, resetTranscript, finalTranscript, isMicrophoneAvailable};
+    return { transcript, listening, startListening, interimTranscript, stopListening, resetTranscript, finalTranscript, isMicrophoneAvailable, browserSupportsSpeechRecognition};
 };

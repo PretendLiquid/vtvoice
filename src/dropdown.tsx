@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Scrollbars from "react-custom-scrollbars-2";
 import { Hotkey } from "vtubestudio";
 import { List } from "./styles/List.styled";
 
@@ -31,22 +32,24 @@ const DropDown: React.FC<DropDownProps> = ({
 
   return (
     <>
-      <List className={showDropDown ? "dropdown" : "dropdown active"}>
-        {hotkeys.map(
-          (hotkey: Hotkey, index: number): JSX.Element => {
-            return (
-              <p
-                key={index}
-                onClick={(): void => {
-                  onClickHandler(hotkey);
-                }}
-              >
-                {hotkey.name}
-              </p>
-            );
-          }
-        )}
-      </List>
+      <Scrollbars style={{ display: "block", backgroundColor: '#7948df', height: '150px', borderRadius: '12px' }}>
+        <List className={showDropDown ? "dropdown" : "dropdown active"}>
+          {hotkeys.map(
+            (hotkey: Hotkey, index: number): JSX.Element => {
+              return (
+                <p
+                  key={index}
+                  onClick={(): void => {
+                    onClickHandler(hotkey);
+                  }}
+                >
+                  {hotkey.name}
+                </p>
+              );
+            }
+          )}
+        </List>
+      </Scrollbars>
     </>
   );
 };

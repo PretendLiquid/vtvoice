@@ -62,6 +62,8 @@ function App() {
   const [showWordSelect, setShowWordSelect] = useState<boolean>(false);
   const [selectedWord, setSelectedWord] = useState<string>("");
   const [selectedLang, setSelectedLang] = useState<string>("en-GB");
+  const [host, setHost] = useState<string>("localhost");
+  const [port, setPort] =  useState<string>("8001");
 
   /**
  * Hide the drop down menu if click occurs
@@ -103,14 +105,14 @@ function App() {
     }
   };
 
-  const connection = useVClient();
+  const connection = useVClient({host: host, port: port});
 
   const toggleDropDown = () => {
     refreshHotkeys();
     setShowDropDown(!showDropDown);
   }
 
-  const { interimTranscript, listening, startListening, stopListening, transcript, finalTranscript, isMicrophoneAvailable } = Dictaphone(hotkeyCommands.map(hc => hc.command), selectedLang);
+  const { interimTranscript, listening, startListening, stopListening, transcript, finalTranscript, isMicrophoneAvailable, browserSupportsSpeechRecognition } = Dictaphone(hotkeyCommands.map(hc => hc.command), selectedLang);
 
 
   useEffect(() => {
@@ -229,6 +231,8 @@ function App() {
               <Question onClick={() => { setShowInfo(true) }}>?</Question>
 
               <Question onClick={() => { setShowPersonalNote(true) }}>♥</Question>
+
+              <Question onClick={() => {}}>⚙</Question>
             </div>
             <Credit>
               <Credits>Current language: {selectedLang}</Credits>
@@ -251,9 +255,8 @@ function App() {
             : <WordButton onClick={() => navigator.mediaDevices.getUserMedia({audio:true}).then((value) => {
               console.log("Mic permission given");
               getMedia();
-          }).catch((error)=> console.log("Error while trying to get mic permission: " + error))}>Give microphone permission</WordButton>
+          }).catch((error)=> console.log("Error while trying to get mic permission: " + error))}>Select a microphone</WordButton>
           }
-
         </OverallContainer>
         {showInfo && (
           <Info>
