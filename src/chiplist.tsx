@@ -1,11 +1,11 @@
 import React from "react";
-import { HotkeyCommand } from "./common";
+import { ActionCommand } from "./common";
 import { Chip, ChipContainer, ChipContainerInner, ChipContent, ChipRemove } from "./styles/Chip.styles";
 
 type ClickableListProps = {
-  items: HotkeyCommand[];
-  onSelect: (item: HotkeyCommand) => void;
-  onRemove: (item: HotkeyCommand) => void;
+  items: ActionCommand[];
+  onSelect: (item: ActionCommand) => void;
+  onRemove: (item: ActionCommand) => void;
   mRef?: React.Ref<HTMLUListElement> | null;
 };
 
@@ -16,7 +16,7 @@ export function Chiplist(props: ClickableListProps) {
         <ChipContent>
           {props.items.map((item, i) => (
             <Chip key={i} onClick={() => props.onSelect(item)}>
-              {item.hotkey.name + " : " + item.word}
+              {item.action.name + " : " + item.displayWord}
               <ChipRemove onClick={() => props.onRemove(item)}>x</ChipRemove>
             </Chip>
           ))}

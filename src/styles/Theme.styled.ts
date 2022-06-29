@@ -3,6 +3,7 @@ export const light = {
     colors: {
         base: "#ffffff",
         base2: "#5622c4",
+        base2Light: '#7948df',
         standardButton: "",
         standardButtonText: "",
         shadow: "#303030",

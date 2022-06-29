@@ -3,8 +3,7 @@ import './App.css';
 import { CurrentModel, Hotkey } from "vtubestudio";
 import { useVClient } from './vtubestudio';
 import { Dictaphone } from './Dictaphone';
-import DropDown from './dropdown';
-import { HotkeyCommand } from './common';
+import { Action, ActionCommand, Command } from './common';
 import { Credit, Credits, Footer, Mail, PersonalNote, Question } from './styles/Footer.styled';
 import { GlobalStyles } from './styles/Global';
 import { CardContainer, Card } from './styles/Card.styled';
@@ -12,10 +11,8 @@ import { CircleGreen, CircleRed } from './styles/Circle.styled';
 import { ConnectionStatus, ModelStatus, StatusContainer, VoiceStatus } from './styles/Status.styled';
 import { AddPanel } from './styles/AddPanel.styled';
 import { HorizontalSplit, SplitWrapper } from './styles/Split.styled';
-import { UnderlinedWord, UnderlinedWordContainer } from './styles/Word.styled';
 import { OverallContainer } from './styles/Container.styled';
 import { Chiplist } from './chiplist';
-import { stringify } from 'querystring';
 import { Close, Info } from './styles/Info.styled';
 import { Helmet } from "react-helmet";
 import { AudioContainer, AudioSelect, MicText } from './styles/Audio.styled';
@@ -24,6 +21,7 @@ import { Example, FlexStartText, TooltipBox, TooltipCard, TooltipText, WordButto
 import LanguageDropdown from './languageDropdown';
 import { ThemeProvider } from 'styled-components';
 import { light } from './styles/Theme.styled';
+import { ActionPanel } from './command/effect/ActionPanel/ActionPanel';
 
 
 // function useLocalStorage<T>(storageKey: string, defaultValue: T){
@@ -39,31 +37,47 @@ import { light } from './styles/Theme.styled';
 // }
 
 
+
 function App() {
-  const [hotkeyCommands, setHotkeyCommands] = useState<HotkeyCommand[]>((JSON.parse(localStorage.getItem('hotkeyCommands')!) ?? []) as HotkeyCommand[]);
+  const [host, setHost] = useState<string>("localhost");
+  const [port, setPort] = useState<string>("8001");
+
+  const connection = useVClient({ host: host, port: port });
+
+  useEffect(() => {
+    refreshHotkeys();
+  }, [connection?.connected]);
+
+  const [actionCommands, setActionCommands] = useState<ActionCommand[]>((JSON.parse(localStorage.getItem('ActionCommands')!) ?? []) as ActionCommand[]);
+  const [commands, setCommands] = useState<Command[]>([]);
   const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
   const [currentDevice, setCurrentDevice] = useState<MediaDeviceInfo>();
 
   useEffect(() => {
-    localStorage.setItem('hotkeyCommands', JSON.stringify(hotkeyCommands));
-  }, [hotkeyCommands]);
+    localStorage.setItem('ActionCommands', JSON.stringify(actionCommands));
+  }, [actionCommands]);
 
-
-  const [selectedHotkey, setSelectedHotkey] = useState<Hotkey>();
   const [showDropDown, setShowDropDown] = useState<boolean>(false);
   const [showLangDropDown, setShowLangDropDown] = useState<boolean>(false);
 
   const [currentWord, setCurrentWord] = useState<string>('');
+
   const [hotkeys, setHotkeys] = useState<Hotkey[]>([]);
+  const [artMeshes, setArtMeshes] = useState<string[]>([]);
+
   const [currentModel, setCurrentModel] = useState<CurrentModel | null>();
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [showPersonalNote, setShowPersonalNote] = useState<boolean>(false);
   const [exactWords, setExactWords] = useState<boolean>(true);
   const [showWordSelect, setShowWordSelect] = useState<boolean>(false);
   const [selectedWord, setSelectedWord] = useState<string>("");
+
   const [selectedLang, setSelectedLang] = useState<string>("en-GB");
-  const [host, setHost] = useState<string>("localhost");
-  const [port, setPort] =  useState<string>("8001");
+
+  const [currentAction, setCurrentAction] = useState<Action>();
+
+  const [showActionPanel, setShowActionPanel] = useState<boolean>(false);
+
 
   /**
  * Hide the drop down menu if click occurs
@@ -76,7 +90,7 @@ function App() {
       setShowDropDown(false);
     }
   }
-  
+
   const getMedia = async () => {
     setAudioDevices((await navigator.mediaDevices.enumerateDevices()).filter((value) => value.kind === 'audioinput'));
   }
@@ -86,33 +100,57 @@ function App() {
   }, [])
 
 
-  /**
-* Callback function to consume the
-* hotkey name from the child component
-*
-* @param hotkey  The selected hotkey
-*/
-  const hotkeySelection = (hotkey: Hotkey): void => {
-    setSelectedHotkey(hotkey);
-  };
-
   const addCommand = () => {
-    if (selectedHotkey && selectedWord) {
+    console.log("add command");
+    console.log(currentAction + " " + selectedWord);
+    if (currentAction && selectedWord) {
       const word = exactWords ? selectedWord : new RegExp("\\b" + selectedWord + "\\b");
-      setHotkeyCommands([...hotkeyCommands, {
-        hotkey: selectedHotkey, command: { command: word, callback: async () => await selectedHotkey.trigger() }, word: selectedWord
+      setActionCommands([...actionCommands, {
+        displayWord: selectedWord, triggerWord: word, action: currentAction
       }]);
     }
   };
 
-  const connection = useVClient({host: host, port: port});
+  useEffect(() => {
+    if (connection.connected) {
+      setCommands(actionCommands.map((command) => actionToCommand(command)));
+      console.log(commands);
+    }
+  }, [actionCommands, connection?.connected, hotkeys]);
+
+  const actionToCommand = (actionCommand: ActionCommand): Command => {
+    switch (actionCommand.action.type) {
+      case "hotkey":
+        const hotkey = hotkeys.find((hotkey) => hotkey.id === actionCommand.action.ids[0]);
+        if (hotkey) {
+          const command : Command = {
+            command: actionCommand.triggerWord,
+            callback: async () => await hotkey.trigger(),
+          }
+          return command;
+        } else {
+          break;
+        };
+      case "colortint":
+        const artmeshes = artMeshes.filter((artMesh) => {return actionCommand.action.ids.includes(artMesh)})
+        if (artmeshes.length > 0) {
+          const command : Command = {
+            command: actionCommand.triggerWord,
+            callback: async () => console.log("colortint" + artmeshes),
+          }
+          return command;
+        };
+    }
+    return {command: actionCommand.triggerWord, callback: () => console.log("Not implemented")};
+  };
+
 
   const toggleDropDown = () => {
     refreshHotkeys();
     setShowDropDown(!showDropDown);
   }
 
-  const { interimTranscript, listening, startListening, stopListening, transcript, finalTranscript, isMicrophoneAvailable, browserSupportsSpeechRecognition } = Dictaphone(hotkeyCommands.map(hc => hc.command), selectedLang);
+  const { interimTranscript, listening, startListening, stopListening, transcript, finalTranscript, isMicrophoneAvailable, browserSupportsSpeechRecognition } = Dictaphone(commands, selectedLang);
 
 
   useEffect(() => {
@@ -136,27 +174,17 @@ function App() {
         setCurrentModel(currentModel);
         const hotkeys = await currentModel?.hotkeys();
         setHotkeys(hotkeys!);
+        const artMeshes = await currentModel?.artMeshNames();
+        setArtMeshes(artMeshes!);
       })
     }
   }, [connection.connected]);
-
-
-  useEffect(() => {
-    refreshHotkeys();
-  }, [connection?.connected, refreshHotkeys]);
 
   let button;
   if (listening) {
     button = <button onClick={stopListening}>Stop voice detection</button>;
   } else {
     button = <button onClick={startListening}>Start voice detection</button>;
-  }
-
-  let word;
-  if (currentWord !== "") {
-    word = <>{currentWord}</>
-  } else {
-    word = <></>
   }
 
   return (
@@ -207,11 +235,8 @@ function App() {
               <AddPanel>
                 <div>
                   <p>Hotkey</p>
-                  <button onClick={toggleDropDown} disabled={!connection.connected} onBlur={(event: React.FocusEvent<HTMLButtonElement>): void => dismissHandler(event)}>
-                    <div>{selectedHotkey ? "Select: " + selectedHotkey.name : " . . ."} </div>
-                    {showDropDown && (
-                      <DropDown hotkeys={hotkeys} showDropDown={false} toggleDropDown={toggleDropDown} hotkeySelection={hotkeySelection} />
-                    )}
+                  <button onClick={() => setShowActionPanel(true)} disabled={!connection.connected} onBlur={(event: React.FocusEvent<HTMLButtonElement>): void => dismissHandler(event)}>
+                    <div style={{ overflow: 'hidden', height: '17px', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentAction ? currentAction.name : " . . ."} </div>
                   </button>
                 </div>
                 <div>
@@ -223,8 +248,8 @@ function App() {
               </AddPanel>
             </Card>
           </CardContainer>
-          <Chiplist items={hotkeyCommands} onSelect={(element) => { }} onRemove={(element) => {
-            setHotkeyCommands(hotkeyCommands.filter(hc => !(hc.word === element.word && hc.hotkey.name === element.hotkey.name)));
+          <Chiplist items={actionCommands} onSelect={(element) => { }} onRemove={(element) => {
+            setActionCommands(actionCommands.filter(hc => !(hc.displayWord === element.displayWord && hc.action.name === element.action.name)));
           }} />
           <Footer>
             <div style={{ display: 'flex', gap: '5px' }}>
@@ -232,7 +257,7 @@ function App() {
 
               <Question onClick={() => { setShowPersonalNote(true) }}>♥</Question>
 
-              <Question onClick={() => {}}>⚙</Question>
+              <Question onClick={() => { }}>⚙</Question>
             </div>
             <Credit>
               <Credits>Current language: {selectedLang}</Credits>
@@ -252,10 +277,10 @@ function App() {
                 setCurrentDevice(Element);
               }} onRemove={(Element) => { }} />
             </AudioContainer>
-            : <WordButton onClick={() => navigator.mediaDevices.getUserMedia({audio:true}).then((value) => {
+            : <WordButton onClick={() => navigator.mediaDevices.getUserMedia({ audio: true }).then((value) => {
               console.log("Mic permission given");
               getMedia();
-          }).catch((error)=> console.log("Error while trying to get mic permission: " + error))}>Select a microphone</WordButton>
+            }).catch((error) => console.log("Error while trying to get mic permission: " + error))}>Select a microphone</WordButton>
           }
         </OverallContainer>
         {showInfo && (
@@ -336,6 +361,9 @@ function App() {
             </WordContainerInner>
             <Close onClick={() => { setShowWordSelect(false) }}>X</Close>
           </WordSelctionContainer>
+        )}
+        {showActionPanel && (
+          <ActionPanel hotkeys={hotkeys} artMeshes={artMeshes} setAction={setCurrentAction} setPanel={setShowActionPanel} />
         )}
       </div>
     </ThemeProvider>
