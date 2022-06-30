@@ -40,6 +40,12 @@ export const HoverButtonShadow = styled.button`
 
 export const StyledCheckBox = styled.button`
     border-style: none;
+    font-weight: bold;
+    justify-items: center;
+    align-items: center;
+    margin: 0px;
+    padding: 0px;
+    border-radius: ${({ theme }) => theme.borderRadius.small};
     width: 30px;
     height: 30px;
 `;

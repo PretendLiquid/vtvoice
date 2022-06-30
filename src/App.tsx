@@ -45,11 +45,11 @@ function App() {
   const connection = useVClient({ host: host, port: port });
 
   useEffect(() => {
-    localStorage.setItem('host', JSON.stringify(host));  
+    localStorage.setItem('host', JSON.stringify(host));
   }, [host]);
 
   useEffect(() => {
-    localStorage.setItem('port', JSON.stringify(port));  
+    localStorage.setItem('port', JSON.stringify(port));
   }, [port]);
 
   useEffect(() => {
@@ -123,9 +123,8 @@ function App() {
   useEffect(() => {
     if (connection.connected) {
       setCommands(actionCommands.map((command) => actionToCommand(command)));
-      console.log(commands);
     }
-  }, [actionCommands, connection?.connected, hotkeys]);
+  }, [actionCommands, connection?.connected, hotkeys, artMeshes]);
 
   const actionToCommand = (actionCommand: ActionCommand): Command => {
     switch (actionCommand.action.type) {
@@ -143,12 +142,25 @@ function App() {
       case "colortint":
         const artmeshes = artMeshes.filter((artMesh) => { return actionCommand.action.ids.includes(artMesh) })
         const color = actionCommand.action.color;
+        const time = Number(actionCommand.action.time);
         if (artmeshes.length > 0 && color) {
-          const command: Command = {
-            command: actionCommand.triggerWord,
-            callback: async () => currentModel?.colorTint({ r: color.r, g: color.g, b: color.b }, { nameExact: actionCommand.action.ids }),
+          if (time && time !== 0) {
+            return {
+              command: actionCommand.triggerWord,
+              callback: async () => {
+                currentModel?.colorTint({ r: color.r, g: color.g, b: color.b }, { nameExact: actionCommand.action.ids });
+                await new Promise(() => setTimeout(() => {
+                  console.log("colortint done after " + time + " seconds")
+                  currentModel?.colorTint({ r: 255, g: 255, b: 255, a: 255 }, { nameExact: actionCommand.action.ids });
+                }, time * 1000));
+              }
+            }
+          } else {
+            return {
+              command: actionCommand.triggerWord,
+              callback: async () => currentModel?.colorTint({ r: color.r, g: color.g, b: color.b }, { nameExact: actionCommand.action.ids }),
+            }
           }
-          return command;
         };
     }
     return { command: actionCommand.triggerWord, callback: () => console.log("Not implemented") };
@@ -197,8 +209,8 @@ function App() {
     button = <button onClick={startListening}>Start voice detection</button>;
   }
 
-  const actionFilter = (a1: Action, a2: Action) => {
-    return !(a1.type === a2.type && a1.ids.length === a2.ids.length && a1.ids.every((id, index) => id === a2.ids[index]));
+  const actionFilter = (a1: ActionCommand, a2: ActionCommand) => {
+    return !(a1.action.type === a2.action.type && a1.triggerWord == a2.triggerWord && a1.action.ids.length === a2.action.ids.length && a1.action.ids.every((id, index) => id === a2.action.ids[index]));
   }
 
 
@@ -264,7 +276,7 @@ function App() {
             </Card>
           </CardContainer>
           <Chiplist items={actionCommands} onSelect={(element) => { }} onRemove={(element) => {
-            setActionCommands(actionCommands.filter(hc => actionFilter(hc.action, element.action)));
+            setActionCommands(actionCommands.filter(hc => actionFilter(hc, element)));
           }} />
           <Footer>
             <div style={{ display: 'flex', gap: '5px' }}>
@@ -274,7 +286,7 @@ function App() {
 
               <Question onClick={() => { setShowSettingPanel(true) }}>⚙</Question>
 
-              <p style={{color: 'white'}}>{process.env.REACT_APP_VERSION}</p>
+              <p style={{ color: 'white' }}>{process.env.REACT_APP_VERSION}</p>
             </div>
             <Credit>
               <Credits>Current language: {selectedLang}</Credits>
@@ -327,14 +339,14 @@ function App() {
         {showSettingPanel && (
           <Info style={{ top: '250px', left: '400px', right: '400px', bottom: '250px' }}>
             <div>
-              <div style={{display: 'flex', height: '30px', alignItems: 'center', gap: '5px'}}>
+              <div style={{ display: 'flex', height: '30px', alignItems: 'center', gap: '5px' }}>
                 <p>Host:</p>
-                <input type="text" placeholder={host} value={host} onChange={(event) =>{ setHost(event.target.value)}} />
+                <input type="text" placeholder={host} value={host} onChange={(event) => { setHost(event.target.value) }} />
                 <p>ex: 0.0.0.0 or localhost</p>
               </div>
-              <div style={{display: 'flex', height: '30px', alignItems: 'center', gap: '8px'}}>
+              <div style={{ display: 'flex', height: '30px', alignItems: 'center', gap: '8px' }}>
                 <p>Port:</p>
-                <input type="number" placeholder={port} value={port} onChange={(event) =>{ setPort(event.target.value)}} />
+                <input type="number" placeholder={port} value={port} onChange={(event) => { setPort(event.target.value) }} />
                 <p>ex: 8001</p>
               </div>
               <p>As of this version a page refresh is needed to apply changes.</p>

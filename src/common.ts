@@ -16,5 +16,6 @@ export interface Action {
     type: string;
     name: string;
     ids: string[];
-    color?: RGBColor; 
+    color?: RGBColor;
+    time? : string; 
 }
