@@ -27,7 +27,9 @@ export const AudioDevice = styled.button`
     border-style: none;
     border-bottom: 2px solid white;
     color: white;
-    background-color: #7948df;
+    height: 20px;
+    background-color: ${({ theme }) => theme.colors.base2Light};
+    border-radius: ${({ theme }) => theme.borderRadius.small};
     padding-left: 10px;
     padding-right: 10px;
     :hover {
