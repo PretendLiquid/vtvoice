@@ -188,6 +188,11 @@ function App() {
     button = <button onClick={startListening}>Start voice detection</button>;
   }
 
+  const actionFilter = (a1: Action, a2: Action) => { 
+    return !(a1.type === a2.type && a1.ids.length === a2.ids.length && a1.ids.every((id, index) => id === a2.ids[index]));
+  }
+
+
   return (
     <ThemeProvider theme={light}>
       <div className="App">
@@ -250,7 +255,7 @@ function App() {
             </Card>
           </CardContainer>
           <Chiplist items={actionCommands} onSelect={(element) => { }} onRemove={(element) => {
-            setActionCommands(actionCommands.filter(hc => !(hc.displayWord === element.displayWord && hc.action.name === element.action.name)));
+            setActionCommands(actionCommands.filter(hc => actionFilter(hc.action, element.action)));
           }} />
           <Footer>
             <div style={{ display: 'flex', gap: '5px' }}>
