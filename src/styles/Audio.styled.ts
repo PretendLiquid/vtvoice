@@ -21,7 +21,6 @@ export const AudioSelect = styled.div`
     display: flex;
     flex-direction: column;
     border-radius: 12px;
-    overflow: hidden;
 `;
 
 export const AudioDevice = styled.button`

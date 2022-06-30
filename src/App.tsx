@@ -273,6 +273,8 @@ function App() {
               <Question onClick={() => { setShowPersonalNote(true) }}>♥</Question>
 
               <Question onClick={() => { setShowSettingPanel(true) }}>⚙</Question>
+
+              <p style={{color: 'white'}}>{process.env.REACT_APP_VERSION}</p>
             </div>
             <Credit>
               <Credits>Current language: {selectedLang}</Credits>
