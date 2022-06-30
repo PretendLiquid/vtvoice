@@ -335,6 +335,7 @@ function App() {
                 <input type="number" placeholder={port} value={port} onChange={(event) =>{ setPort(event.target.value)}} />
                 <p>ex: 8001</p>
               </div>
+              <p>As of this version a page refresh is needed to apply changes.</p>
             </div>
             <Close onClick={() => { setShowSettingPanel(false) }}>X</Close>
           </Info>
