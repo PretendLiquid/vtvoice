@@ -1,3 +1,4 @@
+import { RGBColor } from "react-color";
 import { Hotkey } from "vtubestudio";
 
 export interface ActionCommand {
@@ -15,4 +16,5 @@ export interface Action {
     type: string;
     name: string;
     ids: string[];
+    color?: RGBColor; 
 }

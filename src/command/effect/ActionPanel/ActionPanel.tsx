@@ -1,6 +1,8 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { BlockPicker, Color, ColorChangeHandler, RGBColor, SketchPicker } from "react-color";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { CurrentModel, Hotkey, Plugin } from "vtubestudio";
+import { CheckBox } from "../../../buttons/Button";
 import { Action } from "../../../common";
 import { HoverButtonShadow, HoverButtonTransparentInverted } from "../../../styles/common/Buttons.styled";
 import { Modal } from "../../../styles/common/Modal.styled";
@@ -44,7 +46,7 @@ function HotkeySelection(props: HotkeySelectionProps) {
 
     const getAction = (index: number) => {
         setSelectedHotkey(index);
-        props.setAction({ type: 'hotkey', name: props.hotkeys[index].name, ids: [props.hotkeys[index].id]});
+        props.setAction({ type: 'hotkey', name: props.hotkeys[index].name, ids: [props.hotkeys[index].id] });
     };
 
     return (
@@ -79,16 +81,34 @@ type ColorTintSelectionProps = {
 }
 
 function ColorTintSelection({ artMeshes, setAction }: ColorTintSelectionProps) {
-    const [selectedArtMesh, setSelectedArtMesh] = useState<number>(0);
+    const [selectedArtMesh, setSelectedArtMesh] = useState<number[]>([]);
     const [selectedAll, setSelectedAll] = useState<boolean>(true);
+    const [selectedColor, setSelectedColor] = useState<RGBColor>({ r: 1, g: 1, b: 1, a: 1 });
 
     const getAction = (index: number) => {
-        setSelectedArtMesh(index);
         if (selectedAll) {
-            setAction({name: `ColorTint: ${artMeshes[index]}`, type: 'colortint', ids: artMeshes}
-            );
+            setAction({ name: `ColorTint: Multiple`, type: 'colortint', ids: artMeshes, color: selectedColor });
+        } else {
+            if (!selectedArtMesh.includes(index)) {
+                setSelectedArtMesh([...selectedArtMesh, index]);
+            } else {
+                setSelectedArtMesh(selectedArtMesh.filter(i => i !== index));
+            }
+            const list = selectedArtMesh.map(i => artMeshes[i]);
+            console.log(list + " : " + selectedColor.b + " : " + selectedColor.g + " : " + selectedColor.r);
+            setAction({ name: "ColorTint: Multiple", type: 'colortint', ids: list, color: selectedColor });
         }
     }
+
+    useEffect(()=> {
+        const list = selectedArtMesh.map(i => artMeshes[i]);
+        console.log(list + " : " + selectedColor.b + " : " + selectedColor.g + " : " + selectedColor.r);
+        setAction({ name: "ColorTint: Multiple", type: 'colortint', ids: list, color: selectedColor });
+    }, [selectedColor, selectedArtMesh])
+
+    useEffect(() => {
+        setAction({ name: `ColorTint: Multiple`, type: 'colortint', ids: artMeshes, color: selectedColor });
+    }, [selectedAll])
 
     return (
         <div style={{ flex: '1', display: 'flex' }}>
@@ -96,7 +116,7 @@ function ColorTintSelection({ artMeshes, setAction }: ColorTintSelectionProps) {
                 <Scrollbars>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
                         {artMeshes.map((mesh, index) => {
-                            return <HoverButtonTransparentInverted key={index} className={index === selectedArtMesh || selectedAll ? "active" : ""} style={{ width: '90%', height: '30px' }}
+                            return <HoverButtonTransparentInverted key={index} className={selectedArtMesh.includes(index) || selectedAll ? "active" : ""} style={{ width: '90%', height: '30px' }}
                                 onClick={() => {
                                     getAction(index);
                                 }}>{mesh}</HoverButtonTransparentInverted>
@@ -105,11 +125,14 @@ function ColorTintSelection({ artMeshes, setAction }: ColorTintSelectionProps) {
                 </Scrollbars>
             </div>
             <div style={{ flex: '1' }}>
+                <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', height: '100%', gap: '5px'}}>
+                    <BlockPicker color={selectedColor} onChangeComplete={(color, event) => setSelectedColor(color.rgb)} />
+                    <div style={{height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px'}}>Select all: <CheckBox state={selectedAll} onCheck={() => setSelectedAll(!selectedAll)} /></div>
+                </div>
+
                 {/* <ActionDescription inverted={true} style={{ textAlign: 'left', paddingLeft: '10px', marginBottom: '0px' }}>{props.hotkeys[selectedHotkey]?.name}</ActionDescription> */}
                 <div style={{ width: '170px', height: '150px' }}>
-                    <ActionDescription inverted={true} style={{ fontSize: '12px', textAlign: 'left', paddingLeft: '10px', paddingRight: '10px', marginBottom: '0px', overflowWrap: 'break-word' }}>
-                        {/* {props.hotkeys[selectedHotkey]?.description} */}
-                    </ActionDescription>
+
                 </div>
             </div>
         </div>

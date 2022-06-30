@@ -133,10 +133,11 @@ function App() {
         };
       case "colortint":
         const artmeshes = artMeshes.filter((artMesh) => {return actionCommand.action.ids.includes(artMesh)})
-        if (artmeshes.length > 0) {
+        const color = actionCommand.action.color;
+        if (artmeshes.length > 0 && color) {
           const command : Command = {
             command: actionCommand.triggerWord,
-            callback: async () => console.log("colortint" + artmeshes),
+            callback: async () => currentModel?.colorTint({r: color.r, g: color.g, b: color.b}, {nameExact: actionCommand.action.ids}),
           }
           return command;
         };

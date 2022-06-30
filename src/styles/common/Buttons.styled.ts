@@ -37,3 +37,9 @@ export const HoverButtonShadow = styled.button`
         opacity: 0.8;
     }
 `;
+
+export const StyledCheckBox = styled.button`
+    border-style: none;
+    width: 30px;
+    height: 30px;
+`;

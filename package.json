@@ -54,6 +54,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-color": "^3.0.6",
     "@types/react-helmet": "^6.1.5",
     "gh-pages": "^4.0.0"
   }
