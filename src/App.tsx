@@ -39,10 +39,18 @@ import { ActionPanel } from './command/effect/ActionPanel/ActionPanel';
 
 
 function App() {
-  const [host, setHost] = useState<string>("localhost");
-  const [port, setPort] = useState<string>("8001");
+  const [host, setHost] = useState<string>((JSON.parse(localStorage.getItem('host')!) ?? "localhost"));
+  const [port, setPort] = useState<string>((JSON.parse(localStorage.getItem('port')!) ?? "8001"));
 
   const connection = useVClient({ host: host, port: port });
+
+  useEffect(() => {
+    localStorage.setItem('host', JSON.stringify(host));  
+  }, [host]);
+
+  useEffect(() => {
+    localStorage.setItem('port', JSON.stringify(port));  
+  }, [port]);
 
   useEffect(() => {
     refreshHotkeys();
@@ -68,6 +76,7 @@ function App() {
   const [currentModel, setCurrentModel] = useState<CurrentModel | null>();
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [showPersonalNote, setShowPersonalNote] = useState<boolean>(false);
+  const [showSettingPanel, setShowSettingPanel] = useState<boolean>(false);
   const [exactWords, setExactWords] = useState<boolean>(true);
   const [showWordSelect, setShowWordSelect] = useState<boolean>(false);
   const [selectedWord, setSelectedWord] = useState<string>("");
@@ -123,7 +132,7 @@ function App() {
       case "hotkey":
         const hotkey = hotkeys.find((hotkey) => hotkey.id === actionCommand.action.ids[0]);
         if (hotkey) {
-          const command : Command = {
+          const command: Command = {
             command: actionCommand.triggerWord,
             callback: async () => await hotkey.trigger(),
           }
@@ -132,17 +141,17 @@ function App() {
           break;
         };
       case "colortint":
-        const artmeshes = artMeshes.filter((artMesh) => {return actionCommand.action.ids.includes(artMesh)})
+        const artmeshes = artMeshes.filter((artMesh) => { return actionCommand.action.ids.includes(artMesh) })
         const color = actionCommand.action.color;
         if (artmeshes.length > 0 && color) {
-          const command : Command = {
+          const command: Command = {
             command: actionCommand.triggerWord,
-            callback: async () => currentModel?.colorTint({r: color.r, g: color.g, b: color.b}, {nameExact: actionCommand.action.ids}),
+            callback: async () => currentModel?.colorTint({ r: color.r, g: color.g, b: color.b }, { nameExact: actionCommand.action.ids }),
           }
           return command;
         };
     }
-    return {command: actionCommand.triggerWord, callback: () => console.log("Not implemented")};
+    return { command: actionCommand.triggerWord, callback: () => console.log("Not implemented") };
   };
 
 
@@ -188,7 +197,7 @@ function App() {
     button = <button onClick={startListening}>Start voice detection</button>;
   }
 
-  const actionFilter = (a1: Action, a2: Action) => { 
+  const actionFilter = (a1: Action, a2: Action) => {
     return !(a1.type === a2.type && a1.ids.length === a2.ids.length && a1.ids.every((id, index) => id === a2.ids[index]));
   }
 
@@ -263,7 +272,7 @@ function App() {
 
               <Question onClick={() => { setShowPersonalNote(true) }}>♥</Question>
 
-              <Question onClick={() => { }}>⚙</Question>
+              <Question onClick={() => { setShowSettingPanel(true) }}>⚙</Question>
             </div>
             <Credit>
               <Credits>Current language: {selectedLang}</Credits>
@@ -311,6 +320,23 @@ function App() {
             <p>I hope you enjoy it</p>
             <p>- PretentLiquid (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧</p>
             <Close onClick={() => { setShowPersonalNote(false) }}>X</Close>
+          </Info>
+        )}
+        {showSettingPanel && (
+          <Info style={{ top: '250px', left: '400px', right: '400px', bottom: '250px' }}>
+            <div>
+              <div style={{display: 'flex', height: '30px', alignItems: 'center', gap: '5px'}}>
+                <p>Host:</p>
+                <input type="text" placeholder={host} value={host} onChange={(event) =>{ setHost(event.target.value)}} />
+                <p>ex: 0.0.0.0 or localhost</p>
+              </div>
+              <div style={{display: 'flex', height: '30px', alignItems: 'center', gap: '8px'}}>
+                <p>Port:</p>
+                <input type="number" placeholder={port} value={port} onChange={(event) =>{ setPort(event.target.value)}} />
+                <p>ex: 8001</p>
+              </div>
+            </div>
+            <Close onClick={() => { setShowSettingPanel(false) }}>X</Close>
           </Info>
         )}
         {showWordSelect && (
