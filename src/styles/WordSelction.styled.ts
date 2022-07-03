@@ -113,7 +113,7 @@ export const WordContainerInner = styled.div`
 `;
 
 export const Example = styled.div`
-    background-color: ${({ theme }) => theme.colors.background.primary};
+    background-color: ${({ theme }) => theme.colors.background.secondary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
     padding-left: 15px;
     padding-right: 15px;
