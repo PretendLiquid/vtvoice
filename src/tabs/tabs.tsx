@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Scrollbars from "react-custom-scrollbars-2";
 import { Base2LightDiv } from "../styles/common/Divs.styled";
 import { SideBar } from "../styles/common/SideBar.styled";
 import { ActionHeader } from "../styles/common/Text.styled";

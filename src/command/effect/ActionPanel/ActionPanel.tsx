@@ -20,7 +20,7 @@ type props = {
 
 export function ActionPanel({ hotkeys, setAction, setPanel, artMeshes }: props) {
     return (
-        <Modal style={{ height: '450px', width: '600px', top: '0', bottom: '0', left: '0', right: '0', margin: 'auto', overflow: 'hidden', backgroundColor: 'transparent' }}>
+        <Modal style={{height: '450px', width: '600px', top: '80px', bottom: '0', left: '0', right: '0', margin: 'auto', overflow: 'hidden', backgroundColor: 'transparent' }}>
             <Tabs title="ACTIONS">
                 <Tab title={"Hotkey"}>
                     <HotkeySelection hotkeys={hotkeys} setAction={setAction} />
@@ -139,10 +139,10 @@ function ColorTintSelection({ artMeshes, setAction }: ColorTintSelectionProps) {
                 <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', height: '100%', gap: '5px' }}>
                     <BlockPicker color={selectedColor} onChangeComplete={(color, event) => setSelectedColor(color.rgb)} />
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', gap: '5px' }}>
-                        <div style={{ height: '30px', width: '170px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '5px', color: 'white' }}>Select all: <CheckBox state={selectedAll} onCheck={() => setSelectedAll(!selectedAll)} /></div>
-                        <div style={{ height: '30px', width: '170px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '5px', color: 'white' }}>Permanent: <CheckBox state={permanent} onCheck={() => setPermanent(!permanent)} /></div>
+                        <div style={{ height: '30px', width: '170px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '5px'}}>Select all: <CheckBox state={selectedAll} onCheck={() => setSelectedAll(!selectedAll)} /></div>
+                        <div style={{ height: '30px', width: '170px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '5px'}}>Permanent: <CheckBox state={permanent} onCheck={() => setPermanent(!permanent)} /></div>
                         {!permanent && (
-                            <div style={{ height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', color: 'white' }}>
+                            <div style={{ height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px'}}>
                                 Set time:
                                 <input type={"number"} value={time} onChange={(event) => setTime(event.target.value)} style={{ width: '50px' }} />
                                 sec

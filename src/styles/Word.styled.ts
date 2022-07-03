@@ -6,10 +6,10 @@ export const UnderlinedWord = styled.div`
     font-weight: bold;
     color: #7948df;
     font-family: roboto, sans-serif;
-    background-color: #f2edfc;
+    background-color: ${({ theme }) => theme.colors.background.primary};
     width: 125px;
     height: 30px;
-    border-radius: 10px;
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
     justify-content: center;
     align-items: center;
 `;

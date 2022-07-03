@@ -17,11 +17,12 @@ import { Close, Info } from './styles/Info.styled';
 import { Helmet } from "react-helmet";
 import { AudioContainer, AudioSelect, MicText } from './styles/Audio.styled';
 import { ClickList } from './clickList';
-import { Example, FlexStartText, TooltipBox, TooltipCard, TooltipText, WordButton, WordContainerInner, WordSaid, WordSelctionContainer } from './styles/WordSelction.styled';
+import { Example, FlexStartText, TooltipBox, TooltipCard, TooltipText, WordButton, WordContainerInner, WordSaid, WordSelctionContainer, WordSelectionClose } from './styles/WordSelction.styled';
 import LanguageDropdown from './languageDropdown';
 import { ThemeProvider } from 'styled-components';
 import { light } from './styles/Theme.styled';
 import { ActionPanel } from './command/effect/ActionPanel/ActionPanel';
+import { HoverButtonShadow, ThemeButton } from './styles/common/Buttons.styled';
 
 
 // function useLocalStorage<T>(storageKey: string, defaultValue: T){
@@ -60,6 +61,7 @@ function App() {
   const [commands, setCommands] = useState<Command[]>([]);
   const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
   const [currentDevice, setCurrentDevice] = useState<MediaDeviceInfo>();
+  const [currentTheme, setCurrentTheme] = useState(light);
 
   useEffect(() => {
     localStorage.setItem('ActionCommands', JSON.stringify(actionCommands));
@@ -110,9 +112,9 @@ function App() {
 
 
   const addCommand = () => {
-    console.log("add command");
-    console.log(currentAction + " " + selectedWord);
     if (currentAction && selectedWord) {
+      console.log("add command");
+      console.log(currentAction + " " + selectedWord);
       const word = exactWords ? selectedWord : new RegExp("\\b" + selectedWord + "\\b");
       setActionCommands([...actionCommands, {
         displayWord: selectedWord, triggerWord: word, action: currentAction
@@ -204,18 +206,18 @@ function App() {
 
   let button;
   if (listening) {
-    button = <button onClick={stopListening}>Stop voice detection</button>;
+    button = <HoverButtonShadow onClick={stopListening}>Stop voice detection</HoverButtonShadow>;
   } else {
-    button = <button onClick={startListening}>Start voice detection</button>;
+    button = <HoverButtonShadow onClick={startListening}>Start voice detection</HoverButtonShadow>;
   }
 
   const actionFilter = (a1: ActionCommand, a2: ActionCommand) => {
-    return !(a1.action.type === a2.action.type && a1.triggerWord == a2.triggerWord && a1.action.ids.length === a2.action.ids.length && a1.action.ids.every((id, index) => id === a2.action.ids[index]));
+    return !(a1.action.type === a2.action.type && a1.triggerWord === a2.triggerWord && a1.action.ids.length === a2.action.ids.length && a1.action.ids.every((id, index) => id === a2.action.ids[index]));
   }
 
 
   return (
-    <ThemeProvider theme={light}>
+    <ThemeProvider theme={currentTheme}>
       <div className="App">
         <Helmet>
           <title>Vtvoice</title>
@@ -262,22 +264,23 @@ function App() {
               <AddPanel>
                 <div>
                   <p>Hotkey</p>
-                  <button onClick={() => setShowActionPanel(true)} disabled={!connection.connected} onBlur={(event: React.FocusEvent<HTMLButtonElement>): void => dismissHandler(event)}>
+                  <HoverButtonShadow onClick={() => setShowActionPanel(true)} disabled={!connection.connected} onBlur={(event: React.FocusEvent<HTMLButtonElement>): void => dismissHandler(event)} style={{width: '100px', height: '25px'}}>
                     <div style={{ overflow: 'hidden', height: '17px', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentAction ? currentAction.name : " . . ."} </div>
-                  </button>
+                  </HoverButtonShadow>
                 </div>
                 <div>
                   <p>Word</p>
-                  <button onClick={() => setShowWordSelect(true)}>{selectedWord ? selectedWord : " . . ."}</button>
+                  <HoverButtonShadow onClick={() => setShowWordSelect(true) } style={{width: '100px', height: '25px'}}>{selectedWord ? selectedWord : " . . ."}</HoverButtonShadow>
                 </div>
 
-                <button onClick={addCommand} disabled={!connection.connected}>Add</button>
+                <HoverButtonShadow onClick={addCommand} disabled={!connection.connected} style={{width: '100px', height: '25px'}}>Add</HoverButtonShadow>
               </AddPanel>
             </Card>
           </CardContainer>
+          {!showWordSelect && !showActionPanel && (
           <Chiplist items={actionCommands} onSelect={(element) => { }} onRemove={(element) => {
             setActionCommands(actionCommands.filter(hc => actionFilter(hc, element)));
-          }} />
+          }} />)}
           <Footer>
             <div style={{ display: 'flex', gap: '5px' }}>
               <Question onClick={() => { setShowInfo(true) }}>?</Question>
@@ -296,7 +299,9 @@ function App() {
               <Mail onClick={() => { window.location.href = 'mailto:pretendliquid@gmail.com' }}>✉</Mail>
             </Credit>
           </Footer>
-          {(audioDevices.length !== 0 && audioDevices[0].label !== "") ?
+          {!showWordSelect && !showActionPanel && (
+            <>
+            {(audioDevices.length !== 0 && audioDevices[0].label !== "") ?
             <AudioContainer>
               <MicText>
                 <p>Select a microphone</p>
@@ -311,10 +316,12 @@ function App() {
               getMedia();
             }).catch((error) => console.log("Error while trying to get mic permission: " + error))}>Select a microphone</WordButton>
           }
+          </>
+          )}
         </OverallContainer>
         {showInfo && (
           <Info>
-            <p>The webapp tries to connect to localhost:8001. In the future this will be customizeable</p>
+            <p>The webapp tries to connect to localhost:8001. This can be changed in settings</p>
             <p>If it is not connected try refresing and check vtube studio for auth popup</p>
             <p>To start using it click the "start voice detection" button</p>
             <p>1. Select a hotkey</p>
@@ -328,10 +335,9 @@ function App() {
         {showPersonalNote && (
           <Info>
             <p>Thanks so much for using my webapp. I hope you have many fun moments with it. </p>
-            <p>If you have a great idea for a new vtubestudio project feel free to contact me.</p>
             <p>This project was a trainingground for me to practice typescript.</p>
-            <p> I will continue to update and improve this project until I dont</p>
-            <p>I hope you enjoy it</p>
+            <p>I will continue to update and improve this project until I dont</p>
+            <p>Hope you enjoy it</p>
             <p>- PretentLiquid (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧</p>
             <Close onClick={() => { setShowPersonalNote(false) }}>X</Close>
           </Info>
@@ -406,12 +412,16 @@ function App() {
                 }}>Add</WordButton>
               </div>
             </WordContainerInner>
-            <Close onClick={() => { setShowWordSelect(false) }}>X</Close>
+            <WordSelectionClose onClick={() => { setShowWordSelect(false) }}>X</WordSelectionClose>
           </WordSelctionContainer>
         )}
         {showActionPanel && (
           <ActionPanel hotkeys={hotkeys} artMeshes={artMeshes} setAction={setCurrentAction} setPanel={setShowActionPanel} />
         )}
+        <div style={{ position: 'fixed', top: '10px', right: '10px', display: 'flex', flexDirection: 'column', gap: '5px'}}>
+          <ThemeButton color={'white'} onClick={() => setCurrentTheme(light)}/>
+          {/* <ThemeButton color={'grey'} onClick={() => setCurrentTheme(light)}/> */}
+        </div>
       </div>
     </ThemeProvider>
   );

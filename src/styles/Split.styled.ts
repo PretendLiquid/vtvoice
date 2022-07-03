@@ -18,7 +18,7 @@ interface Props {
 
 export const HorizontalSplit = styled.div<Props>`
     border-top: 2px solid ${props => props.color || "#f2edfc"};
-    border-radius: 25px;
+    border-radius: ${({ theme }) => theme.borderRadius.large};
     display: flex;
     width: ${props => props.width || "100px"};
 `;

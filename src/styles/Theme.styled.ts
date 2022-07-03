@@ -1,13 +1,22 @@
 export const light = {
     name: "light-theme",
     colors: {
-        base: "#ffffff",
-        base2: "#5622c4",
-        base2Light: '#7948df',
-        standardButton: "",
-        standardButtonText: "",
-        shadow: "#303030",
-        text: "#ffffff",
+        background: {
+            primary: "#ffffff",
+            secondary: "#e8e8e8",
+        },
+        button: {
+            primary: "#7948df",
+            secondary: "#F25E95",
+        },
+        shadow: {
+            primary: "#262626",
+            secondary: "#000000",
+        },
+        text: {
+            primary: "#0D0D0D",
+            secondary: "#e8e8e8",
+        },
     },
     borderRadius: {
         small: "5px",
@@ -16,20 +25,13 @@ export const light = {
         circle: "50%"
     },
     shadow: {
-        small: "2px 2px",
+        small: "3px 3px",
         medium: "5px 5px"
     }
 };
 
-export const dark = {
-    name: "dark-theme",
-    colors: {
-        base: "#575757",
-    },
-    borderRadius: {
-        small: "5px",
-        medium: "12px",
-        large: "25px",
-        circle: "50%"
-    }
-};
+// b: "#23272A",
+// b1: "#2C2F33",
+// b2: "#99AAB5",
+// white:"#ffffff",
+// blurple: "#7289DA",

@@ -17,9 +17,10 @@ export const Question = styled.button`
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #875ae2;
-    color: white;
-    border-radius: 12px;
+    text-align: center;
+    background-color: ${({ theme }) => theme.colors.background.primary};
+    color: ${({ theme }) => theme.colors.text.primary};
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
     height: 50px;
     width: 50px;
     padding-left: 5px;
@@ -27,13 +28,13 @@ export const Question = styled.button`
     :hover {
         opacity: 0.8;
     }
-    box-shadow: 2px 2px #2a2a2a;
+    box-shadow: ${({ theme }) => theme.shadow.medium} ${({ theme }) => theme.colors.shadow.primary};
 `;
 
 export const PersonalNote = styled.div`
     font-family: roboto, sans-serif;
     font-weight: bold;
-    color: white;
+    color: ${({ theme }) => theme.colors.text.primary};
 
 `;
 
@@ -47,25 +48,26 @@ export const Credits = styled.div`
 `;
 
 export const Credit = styled.div`
-    color: white;
+    color: ${({ theme }) => theme.colors.text.primary};
     display: flex;
     border-radius: 12px;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
-    background-color: #875ae2;
-    padding-left: 5px;
-    padding-right: 5px;
-    box-shadow: 2px 2px #2a2a2a;
+    gap: 5px;
+    background-color: ${({ theme }) => theme.colors.background.primary};
+    padding-left: 10px;
+    padding-right: 10px;
+    box-shadow: ${({ theme }) => theme.shadow.medium} ${({ theme }) => theme.colors.shadow.primary};
     height: 50px;
     z-index: 1;
 `;
 
 export const Mail = styled.button`
     font-size: 25px;
-    background-color: #875ae2;
+    background-color: transparent;
     border-style: none;
-    color: white;
+    padding-right: 0px;
+    color: ${({ theme }) => theme.colors.text.primary};
     :hover {
         opacity: 0.8;
     }

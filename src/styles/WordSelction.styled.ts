@@ -7,7 +7,7 @@ export const WordSelctionContainer = styled.div`
     left: 200px;
     right: 200px;
     border-radius: 20px;
-    background-color: ${({ theme }) => theme.colors.base2};
+    background-color: ${({ theme }) => theme.colors.background.primary};
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -16,12 +16,12 @@ export const WordSelctionContainer = styled.div`
     font-weight: bold;
     border-style: none;
     font-size: 20px;
-    color: ${({ theme }) => theme.colors.base};
+    color: ${({ theme }) => theme.colors.text.primary};
     padding-top: 20px;
     padding-bottom: 20px;
     padding-left: 40px;
     padding-right: 40px;
-    box-shadow: ${({ theme }) => theme.shadow.medium} ${({ theme }) => theme.colors.shadow};
+    box-shadow: ${({ theme }) => theme.shadow.medium} ${({ theme }) => theme.colors.shadow.primary};
 `;
 
 export const WordButton = styled.button`
@@ -31,9 +31,9 @@ export const WordButton = styled.button`
     display: flex;
     border-style: none;
     border-radius: 12px;
-    color: white;
-    background-color: grey;
-    box-shadow: 5px 5px #2a2a2a;
+    color: ${({ theme }) => theme.colors.text.primary};
+    background-color: ${({ theme }) => theme.colors.button.primary};
+    box-shadow: ${({ theme }) => theme.shadow.small} ${({ theme }) => theme.colors.shadow.primary};
     align-items: center;
     gap: 5px;
     height: 40px;
@@ -56,7 +56,7 @@ export const TooltipBox = styled.div`
    background-color: transparent;
    width: 150px;
    padding: 5px 5px;
-   border-radius: 4px;
+   border-radius: ${({ theme }) => theme.borderRadius.small};;
    overflow: hidden;
    display: flex;
    flex-direction: column;
@@ -66,26 +66,26 @@ export const TooltipBox = styled.div`
 `;
 
 export const TooltipCard = styled.div`
-    background-color: #5d5d5d;
+    background-color: ${({ theme }) => theme.colors.background.primary};
     font-family: roboto, sans-serif;
     font-weight: bold;
     font-size: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 45%;
+    border-radius: ${({ theme }) => theme.borderRadius.circle};
     height: 25px;
     width: 25px;
     position: relative;
     & ${TooltipText}:hover + ${TooltipBox} {
         visibility: visible;
-        color: #fff;
-        background-color: #5d5d5d;
+        color: ${({ theme }) => theme.colors.text.primary};
+        background-color: ${({ theme }) => theme.colors.background.primary};
         width: 630px;
         padding: 8px 8px;
-        border-radius: 12px;
+        border-radius: ${({ theme }) => theme.borderRadius.medium};
    }
-   box-shadow: 2px 2px #2a2a2a;
+   box-shadow: ${({ theme }) => theme.shadow.medium} ${({ theme }) => theme.colors.shadow};
 `;
 
 
@@ -96,10 +96,11 @@ export const WordSaid = styled.div`
     padding-right: 10px;
     overflow: hidden;
     align-self: center;
-    background-color: #9f7ce9;
-    border-radius: 12px;
+    background-color: ${({ theme }) => theme.colors.background.secondary};
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
     width: 90%;
-    box-shadow: 3px 3px #2a2a2a;
+    height: 60px;
+    box-shadow: ${({ theme }) => theme.shadow.small} ${({ theme }) => theme.colors.shadow};
 `;
 
 export const WordContainerInner = styled.div`
@@ -112,11 +113,11 @@ export const WordContainerInner = styled.div`
 `;
 
 export const Example = styled.div`
-    background-color: #484848;
-    border-radius: 12px;
+    background-color: ${({ theme }) => theme.colors.background.primary};
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
     padding-left: 15px;
     padding-right: 15px;
-    box-shadow: 2px 2px #2a2a2a;
+    box-shadow: ${({ theme }) => theme.shadow.small} ${({ theme }) => theme.colors.shadow};
     display: flex;
     justify-content: center;
     gap: 10px;
@@ -129,20 +130,20 @@ export const WordSelectionClose = styled.button`
     top: 10px;
     right: 10px;
     border-style: none;
-    color: white;
+    color: ${({ theme }) => theme.colors.text.primary};
     font-family: roboto, sans-serif;
     font-weight: bold;
-    border-radius: 50%;
-    background-color: #3a1784;
+    border-radius: ${({ theme }) => theme.borderRadius.circle};
+    background-color: ${({ theme }) => theme.colors.button.primary};
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 15px;
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     font-size: 15px;
     :hover {
         opacity: 0.8;
     }
-    box-shadow: 2px 2px #000000;
+    box-shadow: ${({ theme }) => theme.shadow.small} ${({ theme }) => theme.colors.shadow.primary};
 `;

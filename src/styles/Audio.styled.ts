@@ -1,18 +1,16 @@
 import styled from "styled-components";
 
 export const AudioContainer = styled.div`
-    background-color: white;
+    background-color: ${({ theme }) => theme.colors.background.primary};
     display: flex;
     flex-direction: column;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 5px 5px #303030;
+    box-shadow: ${({ theme }) => theme.shadow.medium} ${({ theme }) => theme.colors.shadow.primary};
 `;
 
 export const MicText = styled.div`
 display: flex;
-justify-content: space-between;
-margin: -10px;
 `;
 
 
@@ -25,10 +23,10 @@ export const AudioSelect = styled.div`
 
 export const AudioDevice = styled.button`
     border-style: none;
-    border-bottom: 2px solid white;
-    color: white;
+    border-bottom: 2px solid ${({ theme }) => theme.colors.background.primary};
+    color: ${({ theme }) => theme.colors.text.primary};
     height: 20px;
-    background-color: ${({ theme }) => theme.colors.base2Light};
+    background-color: ${({ theme }) => theme.colors.button.primary};
     border-radius: ${({ theme }) => theme.borderRadius.small};
     padding-left: 10px;
     padding-right: 10px;
