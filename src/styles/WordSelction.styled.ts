@@ -3,7 +3,7 @@ import "@fontsource/roboto"
 
 export const WordSelctionContainer = styled.div`
     position: absolute;
-    top: 350px;
+    top: 290px;
     left: 200px;
     right: 200px;
     border-radius: 20px;

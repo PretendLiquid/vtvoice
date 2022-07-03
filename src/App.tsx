@@ -5,7 +5,6 @@ import { useVClient } from './vtubestudio';
 import { Dictaphone } from './Dictaphone';
 import { Action, ActionCommand, Command } from './common';
 import { Credit, Credits, Footer, Mail, PersonalNote, Question } from './styles/Footer.styled';
-import { GlobalStyles } from './styles/Global';
 import { CardContainer, Card } from './styles/Card.styled';
 import { CircleGreen, CircleRed } from './styles/Circle.styled';
 import { ConnectionStatus, ModelStatus, StatusContainer, VoiceStatus } from './styles/Status.styled';
@@ -20,9 +19,10 @@ import { ClickList } from './clickList';
 import { Example, FlexStartText, TooltipBox, TooltipCard, TooltipText, WordButton, WordContainerInner, WordSaid, WordSelctionContainer, WordSelectionClose } from './styles/WordSelction.styled';
 import LanguageDropdown from './languageDropdown';
 import { ThemeProvider } from 'styled-components';
-import { light } from './styles/Theme.styled';
+import { dark, light, mouse } from './styles/Theme.styled';
 import { ActionPanel } from './command/effect/ActionPanel/ActionPanel';
 import { HoverButtonShadow, ThemeButton } from './styles/common/Buttons.styled';
+import Global from './styles/Global';
 
 
 // function useLocalStorage<T>(storageKey: string, defaultValue: T){
@@ -61,7 +61,7 @@ function App() {
   const [commands, setCommands] = useState<Command[]>([]);
   const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
   const [currentDevice, setCurrentDevice] = useState<MediaDeviceInfo>();
-  const [currentTheme, setCurrentTheme] = useState(light);
+  const [currentTheme, setCurrentTheme] = useState(mouse);
 
   useEffect(() => {
     localStorage.setItem('ActionCommands', JSON.stringify(actionCommands));
@@ -218,11 +218,11 @@ function App() {
 
   return (
     <ThemeProvider theme={currentTheme}>
+      <Global />
       <div className="App">
         <Helmet>
           <title>Vtvoice</title>
         </Helmet>
-        <GlobalStyles />
         <OverallContainer>
           <CardContainer>
             <Card>
@@ -264,23 +264,23 @@ function App() {
               <AddPanel>
                 <div>
                   <p>Hotkey</p>
-                  <HoverButtonShadow onClick={() => setShowActionPanel(true)} disabled={!connection.connected} onBlur={(event: React.FocusEvent<HTMLButtonElement>): void => dismissHandler(event)} style={{width: '100px', height: '25px'}}>
+                  <HoverButtonShadow onClick={() => setShowActionPanel(true)} disabled={!connection.connected} onBlur={(event: React.FocusEvent<HTMLButtonElement>): void => dismissHandler(event)} style={{ width: '100px', height: '25px' }}>
                     <div style={{ overflow: 'hidden', height: '17px', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentAction ? currentAction.name : " . . ."} </div>
                   </HoverButtonShadow>
                 </div>
                 <div>
                   <p>Word</p>
-                  <HoverButtonShadow onClick={() => setShowWordSelect(true) } style={{width: '100px', height: '25px'}}>{selectedWord ? selectedWord : " . . ."}</HoverButtonShadow>
+                  <HoverButtonShadow onClick={() => setShowWordSelect(true)} style={{ width: '100px', height: '25px' }}>{selectedWord ? selectedWord : " . . ."}</HoverButtonShadow>
                 </div>
 
-                <HoverButtonShadow onClick={addCommand} disabled={!connection.connected} style={{width: '100px', height: '25px'}}>Add</HoverButtonShadow>
+                <HoverButtonShadow onClick={addCommand} disabled={!connection.connected} style={{ width: '100px', height: '25px' }}>Add</HoverButtonShadow>
               </AddPanel>
             </Card>
           </CardContainer>
           {!showWordSelect && !showActionPanel && (
-          <Chiplist items={actionCommands} onSelect={(element) => { }} onRemove={(element) => {
-            setActionCommands(actionCommands.filter(hc => actionFilter(hc, element)));
-          }} />)}
+            <Chiplist items={actionCommands} onSelect={(element) => { }} onRemove={(element) => {
+              setActionCommands(actionCommands.filter(hc => actionFilter(hc, element)));
+            }} />)}
           <Footer>
             <div style={{ display: 'flex', gap: '5px' }}>
               <Question onClick={() => { setShowInfo(true) }}>?</Question>
@@ -301,22 +301,22 @@ function App() {
           </Footer>
           {!showWordSelect && !showActionPanel && (
             <>
-            {(audioDevices.length !== 0 && audioDevices[0].label !== "") ?
-            <AudioContainer>
-              <MicText>
-                <p>Select a microphone</p>
-              </MicText>
-              <ClickList items={audioDevices} onSelect={(Element) => {
-                navigator.mediaDevices.getUserMedia({ audio: Element });
-                setCurrentDevice(Element);
-              }} onRemove={(Element) => { }} />
-            </AudioContainer>
-            : <WordButton onClick={() => navigator.mediaDevices.getUserMedia({ audio: true }).then((value) => {
-              console.log("Mic permission given");
-              getMedia();
-            }).catch((error) => console.log("Error while trying to get mic permission: " + error))}>Select a microphone</WordButton>
-          }
-          </>
+              {(audioDevices.length !== 0 && audioDevices[0].label !== "") ?
+                <AudioContainer>
+                  <MicText>
+                    <p>Select a microphone</p>
+                  </MicText>
+                  <ClickList items={audioDevices} onSelect={(Element) => {
+                    navigator.mediaDevices.getUserMedia({ audio: Element });
+                    setCurrentDevice(Element);
+                  }} onRemove={(Element) => { }} />
+                </AudioContainer>
+                : <WordButton onClick={() => navigator.mediaDevices.getUserMedia({ audio: true }).then((value) => {
+                  console.log("Mic permission given");
+                  getMedia();
+                }).catch((error) => console.log("Error while trying to get mic permission: " + error))}>Select a microphone</WordButton>
+              }
+            </>
           )}
         </OverallContainer>
         {showInfo && (
@@ -418,9 +418,10 @@ function App() {
         {showActionPanel && (
           <ActionPanel hotkeys={hotkeys} artMeshes={artMeshes} setAction={setCurrentAction} setPanel={setShowActionPanel} />
         )}
-        <div style={{ position: 'fixed', top: '10px', right: '10px', display: 'flex', flexDirection: 'column', gap: '5px'}}>
-          <ThemeButton color={'white'} onClick={() => setCurrentTheme(light)}/>
-          {/* <ThemeButton color={'grey'} onClick={() => setCurrentTheme(light)}/> */}
+        <div style={{ position: 'fixed', top: '10px', right: '10px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+          <ThemeButton color={'white'} onClick={() => setCurrentTheme(light)} />
+          <ThemeButton color={'grey'} onClick={() => setCurrentTheme(dark)}/>
+          <ThemeButton color={'#755E8C'} onClick={() => setCurrentTheme(mouse)}/>
         </div>
       </div>
     </ThemeProvider>

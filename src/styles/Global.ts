@@ -1,10 +1,13 @@
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle, useTheme, withTheme } from "styled-components";
 import "@fontsource/roboto";
+import { Theme } from "./Theme.styled";
 
-export const GlobalStyles = createGlobalStyle`
+const GlobalStyle = createGlobalStyle<{theme: Theme}>`
     body {
-        background-color: #7948df;
+        background-color: ${({ theme }) => theme.colors.button.primary};
         font-family: roboto, sans-serif;
         font-weight: bold;
     }
 `;
+
+export default withTheme(GlobalStyle);
