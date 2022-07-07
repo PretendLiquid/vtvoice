@@ -32,7 +32,7 @@ export const WordButton = styled.button`
     border-style: none;
     border-radius: 12px;
     color: ${({ theme }) => theme.colors.text.primary};
-    background-color: ${({ theme }) => theme.colors.button.primary};
+    background-color: ${({ theme }) => theme.colors.button.secondary};
     box-shadow: ${({ theme }) => theme.shadow.small} ${({ theme }) => theme.colors.shadow.primary};
     align-items: center;
     gap: 5px;
@@ -134,7 +134,7 @@ export const WordSelectionClose = styled.button`
     font-family: roboto, sans-serif;
     font-weight: bold;
     border-radius: ${({ theme }) => theme.borderRadius.circle};
-    background-color: ${({ theme }) => theme.colors.button.primary};
+    background-color: ${({ theme }) => theme.colors.background.secondary};
     display: flex;
     justify-content: center;
     align-items: center;

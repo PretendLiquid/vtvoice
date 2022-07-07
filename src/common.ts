@@ -5,6 +5,7 @@ export interface ActionCommand {
     displayWord: string;
     triggerWord: RegExp | string;
     action: Action;
+    model: string;
 }
 
 export interface Command {

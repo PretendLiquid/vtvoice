@@ -39,6 +39,9 @@ export const HoverButtonShadow = styled.button`
     :hover {
         opacity: 0.8;
     }
+    :disabled {
+        opacity: 0.8;
+    }
 `;
 
 export const StyledCheckBox = styled.button`

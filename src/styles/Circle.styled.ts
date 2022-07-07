@@ -9,6 +9,7 @@ export const CircleGreen = styled.div`
     border-radius: 50%;
     height: 20px;
     width: 20px;
+    box-shadow: 1px 1px ${({ theme }) => theme.colors.shadow.primary};
 `;
 
 export const CircleRed = styled.div`
@@ -20,4 +21,5 @@ export const CircleRed = styled.div`
     border-radius: 50%;
     height: 20px;
     width: 20px;
+    box-shadow: 1px 1px ${({ theme }) => theme.colors.shadow.primary};
 `;

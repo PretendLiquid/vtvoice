@@ -48,6 +48,11 @@ function HotkeySelection(props: HotkeySelectionProps) {
         props.setAction({ type: 'hotkey', name: props.hotkeys[index].name, ids: [props.hotkeys[index].id] });
     };
 
+    useEffect(() => {
+      getAction(0);
+    }, [])
+    
+
     return (
         <div style={{ flex: '1', display: 'flex' }}>
             <div style={{ flex: '1', height: '400px' }}>
@@ -83,7 +88,7 @@ function ColorTintSelection({ artMeshes, setAction }: ColorTintSelectionProps) {
     const [selectedArtMesh, setSelectedArtMesh] = useState<number[]>([]);
     const [selectedAll, setSelectedAll] = useState<boolean>(true);
     const [selectedColor, setSelectedColor] = useState<RGBColor>({ r: 1, g: 1, b: 1, a: 1 });
-    const [permanent, setPermanent] = useState<boolean>(false);
+    const [permanent, setPermanent] = useState<boolean>(true);
     const [time, setTime] = useState<string>("0");
 
     const toggleAction = (index: number) => {
@@ -144,7 +149,10 @@ function ColorTintSelection({ artMeshes, setAction }: ColorTintSelectionProps) {
                         {!permanent && (
                             <div style={{ height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px'}}>
                                 Set time:
-                                <input type={"number"} value={time} onChange={(event) => setTime(event.target.value)} style={{ width: '50px' }} />
+                                <input type={"number"} value={time} onChange={(event) => {
+                                    const value = Math.max(0, Math.min(10000, Number(event.target.value)));
+                                    setTime(""+value);
+                                }} style={{ width: '50px' }} />
                                 sec
                             </div>
                         )}
