@@ -19,9 +19,9 @@ import { ClickList } from './clickList';
 import { Example, FlexStartText, TooltipBox, TooltipCard, TooltipText, WordButton, WordContainerInner, WordSaid, WordSelctionContainer, WordSelectionClose } from './styles/WordSelction.styled';
 import LanguageDropdown from './languageDropdown';
 import { ThemeProvider } from 'styled-components';
-import { dark, light, mouse } from './styles/Theme.styled';
+import { dark, light, mouse, Theme } from './styles/Theme.styled';
 import { ActionPanel } from './command/effect/ActionPanel/ActionPanel';
-import { HoverButtonShadow, ThemeButton } from './styles/common/Buttons.styled';
+import { BackgroundButton, HoverButtonShadow, ThemeButton } from './styles/common/Buttons.styled';
 import Global from './styles/Global';
 
 
@@ -61,11 +61,15 @@ function App() {
   const [commands, setCommands] = useState<Command[]>([]);
   const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
   const [currentDevice, setCurrentDevice] = useState<MediaDeviceInfo>();
-  const [currentTheme, setCurrentTheme] = useState(light);
+  const [currentTheme, setCurrentTheme] = useState((JSON.parse(localStorage.getItem('theme')!) ?? light) as Theme);
 
   useEffect(() => {
     localStorage.setItem('ActionCommands', JSON.stringify(actionCommands));
   }, [actionCommands]);
+
+  useEffect(() => {
+    localStorage.setItem('theme', JSON.stringify(currentTheme));
+  }, [currentTheme])
 
   const [showDropDown, setShowDropDown] = useState<boolean>(false);
   const [showLangDropDown, setShowLangDropDown] = useState<boolean>(false);
@@ -316,10 +320,10 @@ function App() {
                     setCurrentDevice(Element);
                   }} onRemove={(Element) => { }} />
                 </AudioContainer>
-                : <WordButton onClick={() => navigator.mediaDevices.getUserMedia({ audio: true }).then((value) => {
+                : <BackgroundButton style={{ backgroundColor: "${({ theme }) => theme.colors.background.primary"}} onClick={() => navigator.mediaDevices.getUserMedia({ audio: true }).then((value) => {
                   console.log("Mic permission given");
                   getMedia();
-                }).catch((error) => console.log("Error while trying to get mic permission: " + error))}>Select a microphone</WordButton>
+                }).catch((error) => console.log("Error while trying to get mic permission: " + error))}>Select a microphone</BackgroundButton>
               }
             </>
           )}

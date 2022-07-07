@@ -65,3 +65,18 @@ export const ThemeButton = styled.button`
     border-radius: 12px;
     box-shadow: ${({ theme }) => theme.shadow.medium} ${({ theme }) => theme.colors.shadow.primary};
 `;
+
+export const BackgroundButton = styled.button`
+    font-family: roboto, sans-serif;
+    font-weight: bold;
+    font-size: 15px;
+    display: flex;
+    border-style: none;
+    border-radius: 12px;
+    color: ${({ theme }) => theme.colors.text.primary};
+    background-color: ${({ theme }) => theme.colors.background.primary};
+    box-shadow: ${({ theme }) => theme.shadow.small} ${({ theme }) => theme.colors.shadow.primary};
+    align-items: center;
+    gap: 5px;
+    height: 40px;
+`;

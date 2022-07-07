@@ -32,12 +32,11 @@ export const WordButton = styled.button`
     border-style: none;
     border-radius: 12px;
     color: ${({ theme }) => theme.colors.text.primary};
-    background-color: ${({ theme }) => theme.colors.button.secondary};
+    background-color: ${({ theme }) => theme.colors.button.primary};
     box-shadow: ${({ theme }) => theme.shadow.small} ${({ theme }) => theme.colors.shadow.primary};
     align-items: center;
     gap: 5px;
     height: 40px;
-
 `;
 
 export const TooltipText = styled.div`
