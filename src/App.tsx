@@ -3,7 +3,7 @@ import './App.css';
 import { CurrentModel, Hotkey } from "vtubestudio";
 import { useVClient } from './vtubestudio';
 import { Dictaphone } from './Dictaphone';
-import { Action, ActionCommand, Command } from './common';
+import { Action, ActionCommand, Command, CommandTrigger } from './common';
 import { Credit, Credits, Footer, Mail, PersonalNote, Question } from './styles/Footer.styled';
 import { CardContainer, Card } from './styles/Card.styled';
 import { CircleGreen, CircleRed } from './styles/Circle.styled';
@@ -16,13 +16,14 @@ import { Close, Info } from './styles/Info.styled';
 import { Helmet } from "react-helmet";
 import { AudioContainer, AudioSelect, MicText } from './styles/Audio.styled';
 import { ClickList } from './clickList';
-import { Example, FlexStartText, TooltipBox, TooltipCard, TooltipText, WordButton, WordContainerInner, WordSaid, WordSelctionContainer, WordSelectionClose } from './styles/WordSelction.styled';
+import { Example, FlexStartText, TooltipBox, TooltipCard, WordButton, WordContainerInner, WordSaid, WordSelctionContainer, WordSelectionClose } from './styles/WordSelction.styled';
 import LanguageDropdown from './languageDropdown';
 import { ThemeProvider } from 'styled-components';
 import { dark, light, mouse, Theme } from './styles/Theme.styled';
 import { ActionPanel } from './command/effect/ActionPanel/ActionPanel';
 import { BackgroundButton, HoverButtonShadow, ThemeButton } from './styles/common/Buttons.styled';
 import Global from './styles/Global';
+import { VoicePanel } from './command/voice/VoicePanel';
 
 
 // function useLocalStorage<T>(storageKey: string, defaultValue: T){
@@ -40,6 +41,11 @@ import Global from './styles/Global';
 
 
 function App() {
+  if (process.env.REACT_APP_VERSION === '0.2.0')
+  {
+    localStorage.removeItem('hotkeyCommands');
+    localStorage.removeItem('actionCommands');
+  }
   const [host, setHost] = useState<string>((JSON.parse(localStorage.getItem('host')!) ?? "localhost"));
   const [port, setPort] = useState<string>((JSON.parse(localStorage.getItem('port')!) ?? "8001"));
 
@@ -57,14 +63,14 @@ function App() {
     refreshHotkeys();
   }, [connection?.connected]);
 
-  const [actionCommands, setActionCommands] = useState<ActionCommand[]>((JSON.parse(localStorage.getItem('ActionCommands')!) ?? []) as ActionCommand[]);
+  const [actionCommands, setActionCommands] = useState<ActionCommand[]>((JSON.parse(localStorage.getItem('actionCommands')!) ?? []) as ActionCommand[]);
   const [commands, setCommands] = useState<Command[]>([]);
   const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
   const [currentDevice, setCurrentDevice] = useState<MediaDeviceInfo>();
   const [currentTheme, setCurrentTheme] = useState((JSON.parse(localStorage.getItem('theme')!) ?? light) as Theme);
 
   useEffect(() => {
-    localStorage.setItem('ActionCommands', JSON.stringify(actionCommands));
+    localStorage.setItem('actionCommands', JSON.stringify(actionCommands));
   }, [actionCommands]);
 
   useEffect(() => {
@@ -73,9 +79,6 @@ function App() {
 
   const [showDropDown, setShowDropDown] = useState<boolean>(false);
   const [showLangDropDown, setShowLangDropDown] = useState<boolean>(false);
-
-  const [currentWord, setCurrentWord] = useState<string>('');
-
   const [hotkeys, setHotkeys] = useState<Hotkey[]>([]);
   const [artMeshes, setArtMeshes] = useState<string[]>([]);
 
@@ -83,13 +86,13 @@ function App() {
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [showPersonalNote, setShowPersonalNote] = useState<boolean>(false);
   const [showSettingPanel, setShowSettingPanel] = useState<boolean>(false);
-  const [exactWords, setExactWords] = useState<boolean>(true);
   const [showWordSelect, setShowWordSelect] = useState<boolean>(false);
-  const [selectedWord, setSelectedWord] = useState<string>("");
 
   const [selectedLang, setSelectedLang] = useState<string>("en-GB");
 
   const [currentAction, setCurrentAction] = useState<Action>();
+  const [currentCommandTrigger, setCurrentCommandTrigger] = useState<CommandTrigger>();
+  const [currentDisplayWord, setCurrentDisplayWord] = useState<string>("");
 
   const [showActionPanel, setShowActionPanel] = useState<boolean>(false);
 
@@ -102,7 +105,7 @@ function App() {
  */
   const dismissHandler = (event: React.FocusEvent<HTMLButtonElement>): void => {
     if (event.currentTarget === event.target) {
-      setShowDropDown(false);
+      setShowLangDropDown(false);
     }
   }
 
@@ -116,12 +119,11 @@ function App() {
 
 
   const addCommand = () => {
-    if (currentAction && selectedWord && currentModel) {
+    if (currentAction && currentCommandTrigger && currentModel && currentDisplayWord) {
       console.log("add command");
-      console.log(currentAction + " " + selectedWord);
-      const word = exactWords ? selectedWord : new RegExp("\\b" + selectedWord + "\\b");
+      console.log(currentAction + " " + currentCommandTrigger.triggerWord);
       setActionCommands([...actionCommands, {
-        displayWord: selectedWord, triggerWord: word, action: currentAction, model: currentModel.id
+        displayWord: currentDisplayWord, commandTrigger: currentCommandTrigger, action: currentAction, model: currentModel.id
       }]);
     }
   };
@@ -133,16 +135,33 @@ function App() {
   }, [actionCommands, connection?.connected, hotkeys, artMeshes]);
 
   const actionToCommand = (actionCommand: ActionCommand): Command => {
-    console.log("Generating command: " + actionCommand.displayWord + " : " + actionCommand.action.name);
+    console.log("Generating command: " + actionCommand.displayWord + " : " + actionCommand.action.name + " : " + actionCommand.commandTrigger.triggerWord);
     switch (actionCommand.action.type) {
       case "hotkey":
         const hotkey = hotkeys.find((hotkey) => hotkey.id === actionCommand.action.ids[0]);
         if (hotkey) {
-          const command: Command = {
-            command: actionCommand.triggerWord,
-            callback: async () => await hotkey.trigger(),
+          console.log("Fuzzy: " + actionCommand.commandTrigger.fuzzy);
+          console.log("Threshold: " + actionCommand.commandTrigger.threshold);
+          if (actionCommand.commandTrigger.fuzzy) {
+            const command: Command = {
+              command: actionCommand.commandTrigger.triggerWord,
+              matchInterim: actionCommand.commandTrigger.matchInter,
+              isFuzzyMatch: actionCommand.commandTrigger.fuzzy,
+              fuzzyMatchingThreshold: actionCommand.commandTrigger.threshold,
+              callback: async (command, spokenPhrase, similarityRatio) => {
+                console.log(`${command} and ${spokenPhrase} are ${similarityRatio! * 100}% similar`);
+                await hotkey.trigger();
+              },
+            }
+            return command;
+          } else {
+            const command: Command = {
+              command: actionCommand.commandTrigger.triggerWord,
+              matchInterim: actionCommand.commandTrigger.matchInter,
+              callback: async () => await hotkey.trigger(),
+            }
+            return command;
           }
-          return command;
         } else {
           break;
         };
@@ -152,41 +171,45 @@ function App() {
         const time = Number(actionCommand.action.time);
         if (artmeshes.length > 0 && color) {
           if (time && time !== 0) {
-            return {
-              command: actionCommand.triggerWord,
-              callback: async () => {
-                currentModel?.colorTint({ r: color.r, g: color.g, b: color.b }, { nameExact: actionCommand.action.ids });
-                await new Promise(() => setTimeout(() => {
-                  console.log("colortint done after " + time + " seconds")
-                  currentModel?.colorTint({ r: 255, g: 255, b: 255, a: 255 }, { nameExact: actionCommand.action.ids });
-                }, time * 1000));
-              }
+            if (actionCommand.commandTrigger.fuzzy) {
+              return {
+                command: actionCommand.commandTrigger.triggerWord,
+                matchInterim: actionCommand.commandTrigger.matchInter,
+                isFuzzyMatch: actionCommand.commandTrigger.fuzzy,
+                fuzzyMatchingThreshold: actionCommand.commandTrigger.threshold,
+                callback: async () => {
+                  currentModel?.colorTint({ r: color.r, g: color.g, b: color.b }, { nameExact: actionCommand.action.ids });
+                  await new Promise(() => setTimeout(() => {
+                    console.log("colortint done after " + time + " seconds")
+                    currentModel?.colorTint({ r: 255, g: 255, b: 255, a: 255 }, { nameExact: actionCommand.action.ids });
+                  }, time * 1000));
+                }
+              };
+            } else {
+              return {
+                command: actionCommand.commandTrigger.triggerWord,
+                callback: async () => {
+                  currentModel?.colorTint({ r: color.r, g: color.g, b: color.b }, { nameExact: actionCommand.action.ids });
+                  await new Promise(() => setTimeout(() => {
+                    console.log("colortint done after " + time + " seconds")
+                    currentModel?.colorTint({ r: 255, g: 255, b: 255, a: 255 }, { nameExact: actionCommand.action.ids });
+                  }, time * 1000));
+                }
+              };
             }
           } else {
             return {
-              command: actionCommand.triggerWord,
+              command: actionCommand.commandTrigger.triggerWord,
               callback: async () => currentModel?.colorTint({ r: color.r, g: color.g, b: color.b }, { nameExact: actionCommand.action.ids }),
             }
           }
         };
     }
-    return { command: actionCommand.triggerWord, callback: () => console.log("Not implemented") };
+    return { command: actionCommand.commandTrigger.triggerWord, callback: () => console.log("Not implemented") };
   };
 
 
-  const toggleDropDown = () => {
-    refreshHotkeys();
-    setShowDropDown(!showDropDown);
-  }
-
   const { interimTranscript, listening, startListening, stopListening, transcript, finalTranscript, isMicrophoneAvailable, browserSupportsSpeechRecognition } = Dictaphone(commands, selectedLang);
-
-
-  useEffect(() => {
-    if (interimTranscript !== '') {
-      setCurrentWord(interimTranscript);
-    }
-  }, [interimTranscript])
 
   useEffect(() => {
     console.log("Changing language new one: " + selectedLang);
@@ -194,7 +217,6 @@ function App() {
       startListening();
     }
   }, [selectedLang])
-
 
   const refreshHotkeys = useCallback(() => {
     if (connection && connection.client.wsw.ws.readyState !== connection.client.wsw.ws.CONNECTING) {
@@ -217,7 +239,7 @@ function App() {
   }
 
   const actionFilter = (a1: ActionCommand, a2: ActionCommand) => {
-    return !(a1.action.type === a2.action.type && a1.triggerWord === a2.triggerWord && a1.action.ids.length === a2.action.ids.length && a1.action.ids.every((id, index) => id === a2.action.ids[index]));
+    return !(a1.action.type === a2.action.type && a1.commandTrigger.triggerWord === a2.commandTrigger.triggerWord && a1.action.ids.length === a2.action.ids.length && a1.action.ids.every((id, index) => id === a2.action.ids[index]));
   }
 
 
@@ -269,20 +291,31 @@ function App() {
               <AddPanel>
                 <div>
                   <p>Hotkey</p>
-                  <HoverButtonShadow 
-                  onClick={() => {
-                    refreshHotkeys();
-                    setShowActionPanel(true);
-                  }} disabled={!connection.connected} onBlur={(event: React.FocusEvent<HTMLButtonElement>): void => dismissHandler(event)} style={{ width: '100px', height: '25px' }}>
+                  <HoverButtonShadow
+                    onClick={() => {
+                      refreshHotkeys();
+                      setShowActionPanel(true);
+                      setShowWordSelect(false);
+                    }} disabled={!connection.connected} onBlur={(event: React.FocusEvent<HTMLButtonElement>): void => dismissHandler(event)} style={{ width: '100px', height: '25px' }}>
                     <div style={{ overflow: 'hidden', height: '17px', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentAction ? currentAction.name : " . . ."} </div>
                   </HoverButtonShadow>
                 </div>
                 <div>
                   <p>Word</p>
-                  <HoverButtonShadow onClick={() => setShowWordSelect(true)} style={{ width: '100px', height: '25px' }}>{selectedWord ? selectedWord : " . . ."}</HoverButtonShadow>
+                  <HoverButtonShadow onClick={() => {
+                    setShowWordSelect(true);
+                    setShowActionPanel(false);
+                  }} style={{ width: '100px', height: '25px' }}>
+                    <div style={{ overflow: 'hidden', height: '17px', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {currentCommandTrigger?.triggerWord ? currentCommandTrigger.triggerWord.toString().replaceAll("\\b", "").replaceAll("/", "") : " . . ."}
+                    </div>
+                  </HoverButtonShadow>
                 </div>
-
-                <HoverButtonShadow onClick={addCommand} disabled={!connection.connected} style={{ width: '100px', height: '25px' }}>Add</HoverButtonShadow>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <p style={{ margin: '0px' }}>Command name:</p>
+                  <input type={'text'} value={currentDisplayWord} onChange={(event) => setCurrentDisplayWord(event.target.value)} />
+                  <HoverButtonShadow onClick={addCommand} disabled={currentDisplayWord === ""} style={{ width: '100px', height: '25px' }}>Add</HoverButtonShadow>
+                </div>
               </AddPanel>
             </Card>
           </CardContainer>
@@ -308,25 +341,36 @@ function App() {
               <Mail onClick={() => { window.location.href = 'mailto:pretendliquid@gmail.com' }}>✉</Mail>
             </Credit>
           </Footer>
+          <>
+            {showWordSelect && !showActionPanel && (
+              <VoicePanel transscript={interimTranscript} setPanel={setShowWordSelect} setCommandTrigger={setCurrentCommandTrigger} />
+            )}
+          </>
+          <>
+            {showActionPanel && !showWordSelect && (
+              <ActionPanel hotkeys={hotkeys} artMeshes={artMeshes} setAction={setCurrentAction} setPanel={setShowActionPanel} />
+            )}
+          </>
           {!showWordSelect && !showActionPanel && (
             <>
               {(audioDevices.length !== 0 && audioDevices[0].label !== "") ?
                 <AudioContainer>
                   <MicText>
-                    <p style={{marginTop: '0px'}}>Select a microphone</p>
+                    <p style={{ marginTop: '0px' }}>Select a microphone</p>
                   </MicText>
                   <ClickList items={audioDevices} onSelect={(Element) => {
                     navigator.mediaDevices.getUserMedia({ audio: Element });
                     setCurrentDevice(Element);
                   }} onRemove={(Element) => { }} />
                 </AudioContainer>
-                : <BackgroundButton style={{ backgroundColor: "${({ theme }) => theme.colors.background.primary"}} onClick={() => navigator.mediaDevices.getUserMedia({ audio: true }).then((value) => {
+                : <BackgroundButton style={{ backgroundColor: "${({ theme }) => theme.colors.background.primary" }} onClick={() => navigator.mediaDevices.getUserMedia({ audio: true }).then((value) => {
                   console.log("Mic permission given");
                   getMedia();
                 }).catch((error) => console.log("Error while trying to get mic permission: " + error))}>Select a microphone</BackgroundButton>
               }
             </>
           )}
+
         </OverallContainer>
         {showInfo && (
           <Info>
@@ -365,12 +409,18 @@ function App() {
                 <input type="number" placeholder={port} value={port} onChange={(event) => { setPort(event.target.value) }} />
                 <p>ex: 8001</p>
               </div>
-              <p style={{ textAlign: 'left'}}>Please refresh the page to apply the changes.</p>
+              <p style={{ textAlign: 'left' }}>Please refresh the page to apply the changes.</p>
+              <WordButton style={{ display: 'block', width: '100px' }} onClick={() => setShowLangDropDown(!showLangDropDown)} onBlur={(event: React.FocusEvent<HTMLButtonElement>): void => dismissHandler(event)}>
+                <div>{selectedLang}</div>
+                {showLangDropDown && (
+                  <LanguageDropdown values={['en-GB', 'en-US', 'da-DK', 'de-DE', 'ja', 'es-ES']} showDropDown={false} toggleDropDown={() => setShowLangDropDown(!showLangDropDown)} onSelection={(value: string) => { setSelectedLang(value); }} />
+                )}
+              </WordButton>
             </div>
             <Close onClick={() => { setShowSettingPanel(false) }}>X</Close>
           </Info>
         )}
-        {showWordSelect && (
+        {/* {showWordSelect && (
           <WordSelctionContainer>
             <p style={{fontWeight: 'bold', textAlign: 'left', margin: '0px', padding: '0px', width: '100%'}}>Say something!</p>
             <WordSaid>  
@@ -425,14 +475,11 @@ function App() {
             </WordContainerInner>
             <WordSelectionClose onClick={() => { setShowWordSelect(false) }}>X</WordSelectionClose>
           </WordSelctionContainer>
-        )}
-        {showActionPanel && (
-          <ActionPanel hotkeys={hotkeys} artMeshes={artMeshes} setAction={setCurrentAction} setPanel={setShowActionPanel} />
-        )}
+        )} */}
         <div style={{ position: 'fixed', top: '10px', right: '10px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
           <ThemeButton color={'white'} onClick={() => setCurrentTheme(light)} />
-          <ThemeButton color={'grey'} onClick={() => setCurrentTheme(dark)}/>
-          <ThemeButton color={'#755E8C'} onClick={() => setCurrentTheme(mouse)}/>
+          <ThemeButton color={'grey'} onClick={() => setCurrentTheme(dark)} />
+          <ThemeButton color={'#755E8C'} onClick={() => setCurrentTheme(mouse)} />
         </div>
       </div>
     </ThemeProvider>

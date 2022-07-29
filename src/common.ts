@@ -3,14 +3,24 @@ import { Hotkey } from "vtubestudio";
 
 export interface ActionCommand {
     displayWord: string;
-    triggerWord: RegExp | string;
+    commandTrigger: CommandTrigger;
     action: Action;
     model: string;
 }
 
+export interface CommandTrigger {
+    triggerWord: RegExp | string;
+    matchInter? : boolean;
+    fuzzy? : boolean;
+    threshold? : number;
+}
+
 export interface Command {
     command: RegExp | string;
-    callback: () => void;
+    matchInterim? : boolean;
+    isFuzzyMatch? : boolean;
+    fuzzyMatchingThreshold? : number;
+    callback: (command?: string, spokenPhrase?: string, similarityRation?: number) => void;
 }
 
 export interface Action {

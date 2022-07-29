@@ -20,7 +20,7 @@ type props = {
 
 export function ActionPanel({ hotkeys, setAction, setPanel, artMeshes }: props) {
     return (
-        <Modal style={{height: '450px', width: '600px', top: '80px', bottom: '0', left: '0', right: '0', margin: 'auto', overflow: 'hidden', backgroundColor: 'transparent' }}>
+        <Modal style={{ position: 'relative', height: '450px', width: '600px', margin: 'auto', overflow: 'hidden', backgroundColor: 'transparent' }}>
             <Tabs title="ACTIONS">
                 <Tab title={"Hotkey"}>
                     <HotkeySelection hotkeys={hotkeys} setAction={setAction} />
