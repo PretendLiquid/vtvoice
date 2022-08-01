@@ -5,7 +5,7 @@ import { Hotkey } from "vtubestudio";
 import { CheckBox } from "../../../buttons/CheckBox";
 import { Action } from "../../../common";
 import { HoverButtonShadow, HoverButtonTransparentInverted } from "../../../styles/common/Buttons.styled";
-import { Modal } from "../../../styles/common/Modal.styled";
+import { ModalDiv } from "../../../styles/common/Modal.styled";
 import { ActionDescription } from "../../../styles/common/Text.styled";
 import Tab from "../../../tabs/tab";
 import Tabs from "../../../tabs/tabs";
@@ -20,7 +20,7 @@ type props = {
 
 export function ActionPanel({ hotkeys, setAction, setPanel, artMeshes }: props) {
     return (
-        <Modal style={{ position: 'relative', height: '450px', width: '600px', margin: 'auto', overflow: 'hidden', backgroundColor: 'transparent' }}>
+        <ModalDiv style={{ position: 'relative', height: '450px', width: '600px', margin: 'auto', overflow: 'hidden', backgroundColor: 'transparent' }}>
             <Tabs title="ACTIONS">
                 <Tab title={"Hotkey"}>
                     <HotkeySelection hotkeys={hotkeys} setAction={setAction} />
@@ -31,7 +31,7 @@ export function ActionPanel({ hotkeys, setAction, setPanel, artMeshes }: props) 
             </Tabs>
             <HoverButtonShadow onClick={() => setPanel(false)} style={{ position: 'absolute', width: '60px', height: '30px', bottom: '15px', right: '80px' }}>Close</HoverButtonShadow>
             <HoverButtonShadow onClick={() => setPanel(false)} style={{ position: 'absolute', width: '60px', height: '30px', bottom: '15px', right: '15px' }}>Add</HoverButtonShadow>
-        </Modal >
+        </ModalDiv >
     );
 }
 
@@ -49,9 +49,11 @@ function HotkeySelection(props: HotkeySelectionProps) {
     };
 
     useEffect(() => {
-      getAction(0);
+        if (props.hotkeys) {
+            getAction(0);
+        }
     }, [])
-    
+
 
     return (
         <div style={{ flex: '1', display: 'flex' }}>
@@ -101,7 +103,6 @@ function ColorTintSelection({ artMeshes, setAction }: ColorTintSelectionProps) {
     }
 
     const action = () => {
-        console.log("Action set");
         if (selectedAll) {
             if (permanent || time === "0") {
                 setAction({ name: `ColorTint: Multiple`, type: 'colortint', ids: artMeshes, color: selectedColor });
@@ -144,14 +145,14 @@ function ColorTintSelection({ artMeshes, setAction }: ColorTintSelectionProps) {
                 <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', height: '100%', gap: '5px' }}>
                     <BlockPicker color={selectedColor} onChangeComplete={(color, event) => setSelectedColor(color.rgb)} />
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', gap: '5px' }}>
-                        <div style={{ height: '30px', width: '170px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '5px'}}>Select all: <CheckBox state={selectedAll} onCheck={() => setSelectedAll(!selectedAll)} /></div>
-                        <div style={{ height: '30px', width: '170px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '5px'}}>Permanent: <CheckBox state={permanent} onCheck={() => setPermanent(!permanent)} /></div>
+                        <div style={{ height: '30px', width: '170px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '5px' }}>Select all: <CheckBox state={selectedAll} onCheck={() => setSelectedAll(!selectedAll)} /></div>
+                        <div style={{ height: '30px', width: '170px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '5px' }}>Permanent: <CheckBox state={permanent} onCheck={() => setPermanent(!permanent)} /></div>
                         {!permanent && (
-                            <div style={{ height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px'}}>
+                            <div style={{ height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
                                 Set time:
                                 <input type={"number"} value={time} onChange={(event) => {
                                     const value = Math.max(0, Math.min(10000, Number(event.target.value)));
-                                    setTime(""+value);
+                                    setTime("" + value);
                                 }} style={{ width: '50px' }} />
                                 sec
                             </div>

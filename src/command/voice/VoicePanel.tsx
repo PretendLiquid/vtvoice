@@ -4,7 +4,7 @@ import { CheckBox } from "../../buttons/CheckBox";
 import { CommandTrigger } from "../../common";
 import { HoverButtonShadow } from "../../styles/common/Buttons.styled";
 import { MidBorderDiv } from "../../styles/common/Divs.styled";
-import { Modal } from "../../styles/common/Modal.styled";
+import { ModalDiv } from "../../styles/common/Modal.styled";
 import Tab from "../../tabs/tab";
 import Tabs from "../../tabs/tabs";
 
@@ -16,7 +16,7 @@ type props = {
 
 export function VoicePanel({ setPanel, setCommandTrigger, transscript }: props) {
     return (
-        <Modal style={{ position: 'relative', height: '450px', width: '600px', margin: 'auto', overflow: 'hidden', backgroundColor: 'transparent' }}>
+        <ModalDiv style={{ position: 'relative', height: '450px', width: '600px', margin: 'auto', overflow: 'hidden', backgroundColor: 'transparent' }}>
             <Tabs>
                 <Tab title={"Say it"}>
                     <Voice transscript={transscript} setCommandTrigger={setCommandTrigger} />
@@ -27,7 +27,7 @@ export function VoicePanel({ setPanel, setCommandTrigger, transscript }: props) 
             </Tabs>
             <HoverButtonShadow onClick={() => setPanel(false)} style={{ position: 'absolute', width: '60px', height: '30px', bottom: '15px', right: '80px' }}>Close</HoverButtonShadow>
             <HoverButtonShadow onClick={() => setPanel(false)} style={{ position: 'absolute', width: '60px', height: '30px', bottom: '15px', right: '15px' }}>Add</HoverButtonShadow>
-        </Modal>
+        </ModalDiv>
     );
 }
 

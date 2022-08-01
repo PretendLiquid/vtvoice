@@ -41,10 +41,11 @@ import { VoicePanel } from './command/voice/VoicePanel';
 
 
 function App() {
-  if (process.env.REACT_APP_VERSION === '0.2.0')
-  {
+  const [currentVersion, setCurrentVersion] = useState<string>((JSON.parse(localStorage.getItem('currentVersion')!) ?? '0.2.0'));
+  if (currentVersion === '0.2.0') {
     localStorage.removeItem('hotkeyCommands');
     localStorage.removeItem('actionCommands');
+    setCurrentVersion(process.env.REACT_APP_VERSION ?? '0.3.0');
   }
   const [host, setHost] = useState<string>((JSON.parse(localStorage.getItem('host')!) ?? "localhost"));
   const [port, setPort] = useState<string>((JSON.parse(localStorage.getItem('port')!) ?? "8001"));
@@ -96,13 +97,6 @@ function App() {
 
   const [showActionPanel, setShowActionPanel] = useState<boolean>(false);
 
-
-  /**
- * Hide the drop down menu if click occurs
- * outside of the drop-down element.
- *
- * @param event  The mouse event
- */
   const dismissHandler = (event: React.FocusEvent<HTMLButtonElement>): void => {
     if (event.currentTarget === event.target) {
       setShowLangDropDown(false);
@@ -343,12 +337,12 @@ function App() {
           </Footer>
           <>
             {showWordSelect && !showActionPanel && (
-              <VoicePanel transscript={interimTranscript} setPanel={setShowWordSelect} setCommandTrigger={setCurrentCommandTrigger} />
+                <VoicePanel transscript={interimTranscript} setPanel={setShowWordSelect} setCommandTrigger={setCurrentCommandTrigger} />
             )}
           </>
           <>
             {showActionPanel && !showWordSelect && (
-              <ActionPanel hotkeys={hotkeys} artMeshes={artMeshes} setAction={setCurrentAction} setPanel={setShowActionPanel} />
+                <ActionPanel hotkeys={hotkeys} artMeshes={artMeshes} setAction={setCurrentAction} setPanel={setShowActionPanel} />
             )}
           </>
           {!showWordSelect && !showActionPanel && (
@@ -420,62 +414,6 @@ function App() {
             <Close onClick={() => { setShowSettingPanel(false) }}>X</Close>
           </Info>
         )}
-        {/* {showWordSelect && (
-          <WordSelctionContainer>
-            <p style={{fontWeight: 'bold', textAlign: 'left', margin: '0px', padding: '0px', width: '100%'}}>Say something!</p>
-            <WordSaid>  
-              <p>{currentWord}</p>
-            </WordSaid>
-            <WordContainerInner>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                {exactWords ? <WordButton onClick={() => setExactWords(!exactWords)}>
-                  Exact words
-                  <TooltipCard>
-                    <TooltipText>
-                      <p>?</p>
-                    </TooltipText>
-                    <TooltipBox>
-                      <FlexStartText>Triggers hotkeys everytime you say be exactly the words described and pauses.</FlexStartText>
-                      <div style={{ width: '100%', borderTopStyle: 'solid', paddingBottom: '10px' }}></div>
-                      <FlexStartText>Example: "I like saying cat"</FlexStartText>
-                      <Example>
-                        <p style={{ color: 'red' }}>✗: I like saying cat and dog</p> <p style={{ color: 'lime' }}> ✔: I like saing cat</p>
-                      </Example>
-                      <FlexStartText>Exact word setting means you have to finish talking before it detects</FlexStartText>
-                    </TooltipBox>
-                  </TooltipCard>
-                </WordButton> : <WordButton onClick={() => setExactWords(!exactWords)}>
-                  Words in sentence
-                  <TooltipCard>
-                    <TooltipText>
-                      <p>?</p>
-                    </TooltipText>
-                    <TooltipBox>
-                      <FlexStartText>Triggers hotkeys everytime a word is said</FlexStartText>
-                      <div style={{ width: '100%', borderTopStyle: 'solid', paddingBottom: '10px' }}></div>
-                      <FlexStartText>Example: "I like saying cat"</FlexStartText>
-                      <Example>
-                        <p style={{ color: 'red' }}>✗: I like saying dog and dog </p> <p style={{ color: 'lime' }}> ✔: I like saying cat and dog but I like saying cat the most</p>
-                      </Example>
-                      <FlexStartText>It finds the word in what you say</FlexStartText>
-                    </TooltipBox>
-                  </TooltipCard>
-                </WordButton>}
-                <WordButton style={{ display: 'block', width: '100px' }} onClick={() => setShowLangDropDown(!showLangDropDown)} onBlur={(event: React.FocusEvent<HTMLButtonElement>): void => dismissHandler(event)}>
-                  <div>{selectedLang}</div>
-                  {showLangDropDown && (
-                    <LanguageDropdown values={['en-GB', 'en-US', 'da-DK', 'de-DE', 'ja', 'es-ES']} showDropDown={false} toggleDropDown={() => setShowLangDropDown(!showLangDropDown)} onSelection={(value: string) => { setSelectedLang(value); }} />
-                  )}
-                </WordButton>
-                <WordButton onClick={() => {
-                  setSelectedWord(currentWord);
-                  setShowWordSelect(false);
-                }}>Add</WordButton>
-              </div>
-            </WordContainerInner>
-            <WordSelectionClose onClick={() => { setShowWordSelect(false) }}>X</WordSelectionClose>
-          </WordSelctionContainer>
-        )} */}
         <div style={{ position: 'fixed', top: '10px', right: '10px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
           <ThemeButton color={'white'} onClick={() => setCurrentTheme(light)} />
           <ThemeButton color={'grey'} onClick={() => setCurrentTheme(dark)} />

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const Modal = styled.div`
+export const ModalDiv = styled.div`
     position: absolute;
     border-radius: ${({ theme }) => theme.borderRadius.large};
     background-color: ${({ theme }) => theme.colors.background.primary};
